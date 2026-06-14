@@ -27,6 +27,9 @@ export default async function DashboardPage() {
           <p className="text-sm text-gray-500">Halo, {session.user.name}!</p>
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/history" className="text-sm text-gray-600 hover:underline font-medium">
+            Riwayat
+          </Link>
           <Link href="/profile" className="text-sm text-gray-600 hover:underline font-medium">
             Profil
           </Link>
