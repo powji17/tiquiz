@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import LogoutButton from "./logout-button";
 import Link from "next/link";
+import Navbar from "@/app/components/Navbar";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -21,24 +21,15 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-gray-800">TIQuiz</h1>
-          <p className="text-sm text-gray-500">Halo, {session.user.name}!</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/history" className="text-sm text-gray-600 hover:underline font-medium">
-            Riwayat
-          </Link>
-          <Link href="/profile" className="text-sm text-gray-600 hover:underline font-medium">
-            Profil
-          </Link>
-          <LogoutButton />
-        </div>
-      </header>
+      <Navbar />
 
       <main className="p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Pilih Topik</h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-gray-800">Halo, {session.user.name}! 👋</h2>
+          <p className="text-sm text-gray-500">Pilih topik untuk mulai belajar.</p>
+        </div>
+
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Pilih Topik</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {topics.map((topic) => (

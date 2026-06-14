@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Navbar from "@/app/components/Navbar";
 
 export default async function HistoryPage() {
   const session = await getServerSession(authOptions);
@@ -24,6 +25,7 @@ export default async function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <Link href="/dashboard" className="text-sm text-gray-500 hover:underline">
           ← Kembali ke Dashboard
