@@ -26,7 +26,12 @@ export default async function DashboardPage() {
           <h1 className="text-lg font-bold text-gray-800">TIQuiz</h1>
           <p className="text-sm text-gray-500">Halo, {session.user.name}!</p>
         </div>
-        <LogoutButton />
+        <div className="flex items-center gap-4">
+          <Link href="/profile" className="text-sm text-gray-600 hover:underline font-medium">
+            Profil
+          </Link>
+          <LogoutButton />
+        </div>
       </header>
 
       <main className="p-6">

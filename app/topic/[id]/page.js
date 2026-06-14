@@ -19,7 +19,7 @@ export default async function TopicPage({ params }) {
           _count: { select: { questions: true } },
           attempts: {
             where: { userId: parseInt(session.user.id) },
-            orderBy: { createdAt: "desc" },
+            orderBy: { score: "desc" },
             take: 1,
           },
         },
@@ -44,11 +44,11 @@ export default async function TopicPage({ params }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {topic.quizzes.map((quiz) => {
-            const lastAttempt = quiz.attempts[0];
-            const isPerfect = lastAttempt && lastAttempt.score === lastAttempt.total;
+            const bestAttempt = quiz.attempts[0];
+            const isPerfect = bestAttempt && bestAttempt.score === bestAttempt.total;
 
             let borderStyle = "border-gray-200 hover:border-blue-300";
-            if (lastAttempt) {
+            if (bestAttempt) {
               borderStyle = isPerfect
                 ? "border-green-400 hover:border-green-500"
                 : "border-yellow-400 hover:border-yellow-500";
@@ -72,7 +72,7 @@ export default async function TopicPage({ params }) {
                     {quiz._count.questions} soal
                   </span>
 
-                  {lastAttempt && (
+                  {bestAttempt && (
                     <span
                       className={`text-xs font-medium px-2 py-1 rounded-full ${
                         isPerfect
@@ -80,7 +80,7 @@ export default async function TopicPage({ params }) {
                           : "text-yellow-700 bg-yellow-50"
                       }`}
                     >
-                      Skor: {lastAttempt.score}/{lastAttempt.total}
+                      Skor terbaik: {bestAttempt.score}/{bestAttempt.total}
                     </span>
                   )}
                 </div>
