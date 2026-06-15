@@ -88,31 +88,36 @@ export default async function ProfilePage() {
         </p>
       </header>
 
-      <main className="p-6 max-w-3xl mx-auto">
+      <main className="p-4 sm:p-6 max-w-3xl mx-auto">
         {/* Statistik keseluruhan */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-center">
-            <p className="text-2xl font-bold text-blue-600">
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-3 sm:p-5 text-center">
+            <p className="text-xl sm:text-2xl font-bold text-blue-600">
               {completedAll}/{totalQuizzesAll}
             </p>
-            <p className="text-sm text-gray-500 mt-1">Kuis Dikerjakan</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Kuis Dikerjakan</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-center">
-            <p className="text-2xl font-bold text-green-600">{perfectAll}</p>
-            <p className="text-sm text-gray-500 mt-1">Kuis Sempurna (100%)</p>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-3 sm:p-5 text-center">
+            <p className="text-xl sm:text-2xl font-bold text-green-600">{perfectAll}</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Kuis Sempurna (100%)</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-center">
-            <p className="text-2xl font-bold text-teal-600">
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-3 sm:p-5 text-center">
+            <p className="text-xl sm:text-2xl font-bold text-teal-600">
               {perfectTopicsCount}/{topicStats.length}
             </p>
-            <p className="text-sm text-gray-500 mt-1">Topik Tuntas 100%</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Topik Tuntas 100%</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-center">
-            <p className="text-2xl font-bold text-purple-600">
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-3 sm:p-5 text-center">
+            <p className="text-xl sm:text-2xl font-bold text-purple-600">
               {overallAvg !== null ? `${overallAvg}%` : "-"}
             </p>
-            <p className="text-sm text-gray-500 mt-1">Rata-rata Skor</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Rata-rata Skor</p>
           </div>
+
         </div>
 
         {/* Progress per topik */}

@@ -82,11 +82,11 @@ export default function QuizClient({ quiz }) {
 
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <h1 className="text-lg font-bold text-gray-800">{quiz.name} — Hasil Kuis</h1>
+        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
+          <h1 className="text-base sm:text-lg font-bold text-gray-800">{quiz.name} — Hasil Kuis</h1>
         </header>
 
-        <main className="flex-1 p-6 max-w-2xl mx-auto w-full">
+        <main className="flex-1 p-4 sm:p-6 max-w-2xl mx-auto w-full">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6 text-center">
             <p className="text-sm text-gray-500 mb-1">Skor Kamu</p>
             <p className="text-4xl font-bold text-blue-600 mb-1">
@@ -147,19 +147,20 @@ export default function QuizClient({ quiz }) {
   // ===== Halaman Kuis =====
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-gray-800">{quiz.name}</h1>
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h1 className="text-base sm:text-lg font-bold text-gray-800 truncate">{quiz.name}</h1>
           <p className="text-sm text-gray-500">
             Soal {currentIndex + 1} dari {questions.length}
           </p>
         </div>
-        <Link href={backHref} className="text-sm text-gray-500 hover:underline">
-          Keluar dari Kuis
+        <Link href={backHref} className="text-sm text-gray-500 hover:underline whitespace-nowrap shrink-0">
+          <span className="hidden sm:inline">Keluar dari Kuis</span>
+          <span className="sm:hidden">Keluar</span>
         </Link>
       </header>
 
-      <main className="flex-1 p-6 flex flex-col items-center">
+      <main className="flex-1 p-6 sm:p-6 flex flex-col items-center">
         {/* Progress indicator */}
         <div className="w-full max-w-2xl flex flex-wrap gap-2 mb-4">
           {questions.map((q, idx) => {
