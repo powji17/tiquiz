@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function QuizClient({ quiz }) {
   const { questions } = quiz;
@@ -9,7 +10,6 @@ export default function QuizClient({ quiz }) {
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
 
   const currentQuestion = questions[currentIndex];
@@ -51,7 +51,6 @@ export default function QuizClient({ quiz }) {
   const handleSubmit = async () => {
     setShowConfirm(false);
     setSubmitting(true);
-    setError("");
 
     try {
       const res = await fetch("/api/quiz/submit", {
@@ -63,13 +62,13 @@ export default function QuizClient({ quiz }) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Terjadi kesalahan, coba lagi.");
+        toast.error(data.error || "Terjadi kesalahan, coba lagi.");
         setSubmitting(false);
       } else {
         setResult(data);
       }
     } catch (err) {
-      setError("Gagal terhubung ke server.");
+      toast.error("Gagal terhubung ke server.");
       setSubmitting(false);
     }
   };
@@ -183,11 +182,6 @@ export default function QuizClient({ quiz }) {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full max-w-2xl">
-          {error && (
-            <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
-              {error}
-            </div>
-          )}
 
           <p className="text-gray-800 font-medium mb-4">{currentQuestion.text}</p>
 

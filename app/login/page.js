@@ -4,18 +4,17 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     const result = await signIn("credentials", {
       email,
@@ -24,7 +23,7 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("Email atau password salah.");
+      toast.error("Email atau password salah.");
       setLoading(false);
     } else {
       router.push("/dashboard");
@@ -37,12 +36,6 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Masuk ke TIQuiz</h1>
         <p className="text-gray-500 mb-6 text-sm">Belajar lebih terukur, hasil lebih nyata.</p>
 
-        {error && (
-          <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -50,7 +43,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full text-gray-700 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-gray-500 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="contoh@email.com"
               required
             />
@@ -61,8 +54,8 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full text-gray-700 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="password"
+              className="w-full text-gray-500 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="••••••••"
               required
             />
           </div>
