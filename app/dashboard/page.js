@@ -4,49 +4,57 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Navbar from "@/app/components/Navbar";
+import DashboardClient from "./dashboard-client";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
+  if (!session) redirect("/login");
 
-  if (!session) {
-    redirect("/login");
-  }
+  const userId = parseInt(session.user.id);
 
   const topics = await prisma.topic.findMany({
     include: {
-      _count: { select: { quizzes: true } },
+      quizzes: {
+        include: {
+          attempts: {
+            where: { userId },
+            orderBy: { score: "desc" },
+            take: 1,
+          },
+        },
+      },
     },
     orderBy: { name: "asc" },
   });
 
+  // Hitung status per topik untuk stack-bar
+  const topicsWithStats = topics.map((topic, index) => {
+    const quizStatuses = topic.quizzes.map((quiz) => {
+      const best = quiz.attempts[0];
+      if (!best) return "empty";
+      if (best.score === best.total) return "perfect";
+      return "partial";
+    });
+
+    const perfectCount = quizStatuses.filter((s) => s === "perfect").length;
+    const isTopicComplete = perfectCount === topic.quizzes.length && topic.quizzes.length > 0;
+
+    return {
+      id: topic.id,
+      name: topic.name,
+      description: topic.description,
+      index: String(index + 1).padStart(2, "0"),
+      quizStatuses,
+      totalQuizzes: topic.quizzes.length,
+      perfectCount,
+      isTopicComplete,
+    };
+  });
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <Navbar />
-
-      <main className="p-6">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">Halo, {session.user.name}! 👋</h2>
-          <p className="text-sm text-gray-500">Pilih topik untuk mulai belajar.</p>
-        </div>
-
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Pilih Topik</h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {topics.map((topic) => (
-            <Link
-              key={topic.id}
-              href={`/topic/${topic.id}`}
-              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-blue-300 transition block"
-            >
-              <h3 className="font-semibold text-gray-800 mb-1">{topic.name}</h3>
-              <p className="text-sm text-gray-500 mb-3">{topic.description}</p>
-              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                {topic._count.quizzes} kuis
-              </span>
-            </Link>
-          ))}
-        </div>
-      </main>
+      <DashboardClient topics={topicsWithStats} userName={session.user.name} />
     </div>
   );
 }

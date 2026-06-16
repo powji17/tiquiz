@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
 export default function QuizClient({ quiz }) {
@@ -11,6 +12,7 @@ export default function QuizClient({ quiz }) {
   const [result, setResult] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [direction, setDirection] = useState(1);
 
   const currentQuestion = questions[currentIndex];
   const options = currentQuestion
@@ -32,20 +34,17 @@ export default function QuizClient({ quiz }) {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: key }));
   };
 
-  const goNext = () => {
-    if (currentIndex < questions.length - 1) setCurrentIndex(currentIndex + 1);
+  const goTo = (idx) => {
+    setDirection(idx > currentIndex ? 1 : -1);
+    setCurrentIndex(idx);
   };
 
-  const goPrev = () => {
-    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
-  };
+  const goNext = () => { if (currentIndex < questions.length - 1) goTo(currentIndex + 1); };
+  const goPrev = () => { if (currentIndex > 0) goTo(currentIndex - 1); };
 
   const handleFinishClick = () => {
-    if (unansweredIndices.length > 0) {
-      setShowConfirm(true);
-    } else {
-      handleSubmit();
-    }
+    if (unansweredIndices.length > 0) setShowConfirm(true);
+    else handleSubmit();
   };
 
   const handleSubmit = async () => {
@@ -79,66 +78,191 @@ export default function QuizClient({ quiz }) {
   // ===== Hasil Kuis =====
   if (result) {
     const percentage = Math.round((result.score / result.total) * 100);
+    const isPerfect = result.score === result.total;
 
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
-          <h1 className="text-base sm:text-lg font-bold text-gray-800">{quiz.name} — Hasil Kuis</h1>
+      <div className="min-h-screen" style={{ background: "var(--background)" }}>
+        <header
+          className="bg-white px-4 sm:px-6 py-4"
+          style={{ borderBottom: "1px solid var(--color-line)" }}
+        >
+          <div className="max-w-2xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span
+                style={{
+                  fontFamily: "var(--font-jetbrains)",
+                  background: "var(--color-primary-tint)",
+                  color: "var(--color-primary)",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  padding: "2px 8px",
+                  borderRadius: "4px",
+                }}
+              >
+                TQ
+              </span>
+              <span className="text-sm font-bold" style={{ color: "var(--color-foreground)" }}>
+                Hasil Kuis
+              </span>
+            </div>
+            <Link href={backHref} className="text-sm" style={{ color: "var(--color-muted)" }}>
+              ← Kembali
+            </Link>
+          </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 max-w-2xl mx-auto w-full">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6 text-center">
-            <p className="text-sm text-gray-500 mb-1">Skor Kamu</p>
-            <p className="text-4xl font-bold text-blue-600 mb-1">
-              {result.score} / {result.total}
+        <main className="px-4 sm:px-6 py-8 max-w-2xl mx-auto">
+          {/* Score card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white rounded-2xl p-8 text-center mb-6"
+            style={{ border: `1px solid ${isPerfect ? "var(--color-success)" : "var(--color-line)"}` }}
+          >
+            <p className="text-sm font-medium mb-2" style={{ color: "var(--color-muted)" }}>
+              {quiz.name}
             </p>
-            <p className="text-sm text-gray-500">{percentage}% benar</p>
-          </div>
+            <motion.p
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              style={{
+                fontFamily: "var(--font-jetbrains)",
+                fontSize: "52px",
+                fontWeight: 700,
+                color: isPerfect ? "var(--color-success)" : "var(--color-primary)",
+                lineHeight: 1,
+                marginBottom: "8px",
+              }}
+            >
+              {result.score}/{result.total}
+            </motion.p>
+            <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+              {percentage}% benar
+              {isPerfect && (
+                <span
+                  className="ml-2 font-semibold"
+                  style={{ color: "var(--color-success)" }}
+                >
+                  · Sempurna! 🎉
+                </span>
+              )}
+            </p>
 
+            {/* Progress bar skor */}
+            <div
+              className="w-full rounded-full overflow-hidden mt-4"
+              style={{ height: "6px", background: "var(--color-line)" }}
+            >
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${percentage}%` }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                style={{
+                  height: "100%",
+                  background: isPerfect ? "var(--color-success)" : "var(--color-primary)",
+                  borderRadius: "999px",
+                }}
+              />
+            </div>
+          </motion.div>
+
+          {/* Pembahasan */}
           <div className="space-y-4">
             {result.results.map((r, idx) => (
-              <div key={r.questionId} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-                <p className="font-medium text-gray-800 mb-3">
+              <motion.div
+                key={r.questionId}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 + idx * 0.07 }}
+                className="bg-white rounded-2xl p-5"
+                style={{ border: "1px solid var(--color-line)" }}
+              >
+                <p
+                  className="font-semibold mb-3 text-sm"
+                  style={{ color: "var(--color-foreground)" }}
+                >
                   {idx + 1}. {r.text}
                 </p>
-                <div className="space-y-1 mb-3">
+                <div className="space-y-2 mb-3">
                   {Object.entries(r.options).map(([key, text]) => {
-                    let style = "border-gray-200";
-                    if (key === r.correctAnswer) style = "border-green-500 bg-green-50 text-green-700";
-                    if (key === r.userAnswer && !r.isCorrect) style = "border-red-500 bg-red-50 text-red-700";
+                    let bg = "transparent";
+                    let border = "var(--color-line)";
+                    let color = "var(--color-foreground)";
+
+                    if (key === r.correctAnswer) {
+                      bg = "var(--color-success-tint)";
+                      border = "var(--color-success)";
+                      color = "var(--color-success)";
+                    } else if (key === r.userAnswer && !r.isCorrect) {
+                      bg = "var(--color-danger-tint)";
+                      border = "var(--color-danger)";
+                      color = "var(--color-danger)";
+                    }
 
                     return (
-                      <div key={key} className={`px-3 py-2 rounded-lg border text-sm ${style}`}>
-                        <span className="font-semibold mr-2">{key}.</span>
-                        {text}
-                        {key === r.correctAnswer && " ✓"}
-                        {key === r.userAnswer && !r.isCorrect && " ✗"}
+                      <div
+                        key={key}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm"
+                        style={{ background: bg, border: `1px solid ${border}`, color }}
+                      >
+                        <span
+                          style={{
+                            fontFamily: "var(--font-jetbrains)",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            minWidth: "16px",
+                          }}
+                        >
+                          {key}
+                        </span>
+                        <span style={{ flex: 1 }}>{text}</span>
+                        {key === r.correctAnswer && (
+                          <span style={{ fontSize: "12px", fontWeight: 700 }}>✓</span>
+                        )}
+                        {key === r.userAnswer && !r.isCorrect && (
+                          <span style={{ fontSize: "12px", fontWeight: 700 }}>✗</span>
+                        )}
                       </div>
                     );
                   })}
                 </div>
                 {!r.userAnswer && (
-                  <p className="text-xs text-orange-500 mb-2">
-                    ⚠ Soal ini tidak kamu jawab.
+                  <p className="text-xs mb-2" style={{ color: "var(--color-warning)" }}>
+                    ⚠ Soal ini tidak dijawab
                   </p>
                 )}
                 {r.explanation && (
-                  <p className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+                  <div
+                    className="text-xs px-3 py-2.5 rounded-lg"
+                    style={{
+                      background: "var(--color-primary-tint)",
+                      color: "var(--color-primary-dark)",
+                      lineHeight: 1.6,
+                    }}
+                  >
                     💡 {r.explanation}
-                  </p>
+                  </div>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
 
-          <div className="mt-6 flex gap-3">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-6 flex gap-3"
+          >
             <Link
               href={backHref}
-              className="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-3 rounded-lg transition"
+              className="flex-1 text-center py-3 rounded-xl text-sm font-semibold text-white transition-opacity"
+              style={{ background: "var(--color-primary)" }}
             >
               Kembali ke Daftar Kuis
             </Link>
-          </div>
+          </motion.div>
         </main>
       </div>
     );
@@ -146,125 +270,265 @@ export default function QuizClient({ quiz }) {
 
   // ===== Halaman Kuis =====
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <h1 className="text-base sm:text-lg font-bold text-gray-800 truncate">{quiz.name}</h1>
-          <p className="text-sm text-gray-500">
-            Soal {currentIndex + 1} dari {questions.length}
-          </p>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: "var(--background)" }}
+    >
+      {/* Header */}
+      <header
+        className="bg-white px-4 sm:px-6 py-4"
+        style={{ borderBottom: "1px solid var(--color-line)" }}
+      >
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <h1
+              className="font-bold truncate"
+              style={{ fontSize: "15px", color: "var(--color-foreground)" }}
+            >
+              {quiz.name}
+            </h1>
+            <p
+              style={{
+                fontFamily: "var(--font-jetbrains)",
+                fontSize: "11px",
+                color: "var(--color-muted)",
+                marginTop: "2px",
+              }}
+            >
+              {currentIndex + 1}/{questions.length}
+            </p>
+          </div>
+          <Link
+            href={backHref}
+            className="text-sm shrink-0"
+            style={{ color: "var(--color-muted)" }}
+          >
+            <span className="hidden sm:inline">Keluar dari Kuis</span>
+            <span className="sm:hidden">Keluar</span>
+          </Link>
         </div>
-        <Link href={backHref} className="text-sm text-gray-500 hover:underline whitespace-nowrap shrink-0">
-          <span className="hidden sm:inline">Keluar dari Kuis</span>
-          <span className="sm:hidden">Keluar</span>
-        </Link>
+
+        {/* Progress bar */}
+        <div
+          className="max-w-2xl mx-auto mt-3 rounded-full overflow-hidden"
+          style={{ height: "3px", background: "var(--color-line)" }}
+        >
+          <motion.div
+            animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+            transition={{ duration: 0.3 }}
+            style={{
+              height: "100%",
+              background: "var(--color-primary)",
+              borderRadius: "999px",
+            }}
+          />
+        </div>
       </header>
 
-      <main className="flex-1 p-6 sm:p-6 flex flex-col items-center">
-        {/* Progress indicator */}
-        <div className="w-full max-w-2xl flex flex-wrap gap-2 mb-4">
+      <main className="flex-1 px-4 sm:px-6 py-6 flex flex-col items-center">
+        {/* Navigator soal */}
+        <div className="w-full max-w-2xl flex flex-wrap gap-2 mb-5">
           {questions.map((q, idx) => {
             const isAnswered = !!answers[q.id];
             const isCurrent = idx === currentIndex;
             return (
-              <button
+              <motion.button
                 key={q.id}
-                onClick={() => setCurrentIndex(idx)}
-                className={`w-9 h-9 rounded-lg text-sm font-medium border transition flex items-center justify-center ${
-                  isAnswered
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-600 border-gray-300"
-                } ${isCurrent ? "ring-2 ring-offset-1 ring-blue-400" : ""}`}
+                onClick={() => goTo(idx)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "6px",
+                  fontSize: "11px",
+                  fontFamily: "var(--font-jetbrains)",
+                  fontWeight: 600,
+                  border: isCurrent
+                    ? "2px solid var(--color-primary)"
+                    : isAnswered
+                    ? "1px solid var(--color-success)"
+                    : "1px solid var(--color-line)",
+                  background: isAnswered
+                    ? "var(--color-success-tint)"
+                    : "white",
+                  color: isAnswered
+                    ? "var(--color-success)"
+                    : isCurrent
+                    ? "var(--color-primary)"
+                    : "var(--color-muted)",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
               >
                 {idx + 1}
-              </button>
+              </motion.button>
             );
           })}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full max-w-2xl">
-
-          <p className="text-gray-800 font-medium mb-4">{currentQuestion.text}</p>
-
-          <div className="space-y-2">
-            {options.map((opt) => (
-              <button
-                key={opt.key}
-                onClick={() => handleSelect(opt.key)}
-                className={`w-full text-gray-700 text-left px-4 py-3 rounded-lg border text-sm transition ${
-                  answers[currentQuestion.id] === opt.key
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
+        {/* Kartu soal */}
+        <div className="w-full max-w-2xl flex-1 flex flex-col">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={currentIndex}
+              custom={direction}
+              variants={{
+                enter: (d) => ({ opacity: 0, x: d * 30 }),
+                center: { opacity: 1, x: 0 },
+                exit: (d) => ({ opacity: 0, x: d * -30 }),
+              }}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="bg-white rounded-2xl p-6 flex-1"
+              style={{ border: "1px solid var(--color-line)" }}
+            >
+              <p
+                className="font-semibold mb-5 leading-relaxed"
+                style={{ fontSize: "15px", color: "var(--color-foreground)" }}
               >
-                <span className="font-semibold mr-2">{opt.key}.</span>
-                {opt.text}
-              </button>
-            ))}
-          </div>
+                {currentQuestion.text}
+              </p>
 
-          <div className="flex items-center justify-between mt-6">
-            <button
+              <div className="space-y-2.5">
+                {options.map((opt) => {
+                  const isSelected = answers[currentQuestion.id] === opt.key;
+                  return (
+                    <motion.button
+                      key={opt.key}
+                      onClick={() => handleSelect(opt.key)}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all"
+                      style={{
+                        border: `1.5px solid ${isSelected ? "var(--color-primary)" : "var(--color-line)"}`,
+                        background: isSelected ? "var(--color-primary-tint)" : "white",
+                        color: isSelected ? "var(--color-primary-dark)" : "var(--color-foreground)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "var(--font-jetbrains)",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          minWidth: "16px",
+                          color: isSelected ? "var(--color-primary)" : "var(--color-muted)",
+                        }}
+                      >
+                        {opt.key}
+                      </span>
+                      {opt.text}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigasi */}
+          <div className="flex items-center justify-between mt-4 pb-4">
+            <motion.button
               onClick={goPrev}
               disabled={currentIndex === 0}
-              className="text-sm font-medium text-gray-600 disabled:opacity-40 hover:underline"
+              whileHover={{ x: -2 }}
+              className="text-sm font-medium disabled:opacity-30"
+              style={{ color: "var(--color-muted)" }}
             >
               ← Sebelumnya
-            </button>
+            </motion.button>
 
             {!isLast ? (
-              <button
+              <motion.button
                 onClick={goNext}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white"
+                style={{ background: "var(--color-primary)" }}
               >
                 Selanjutnya →
-              </button>
+              </motion.button>
             ) : (
-              <button
+              <motion.button
                 onClick={handleFinishClick}
                 disabled={submitting}
-                className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition disabled:opacity-50"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+                style={{ background: "var(--color-success)" }}
               >
                 {submitting ? "Menilai..." : `Selesai (${answeredCount}/${questions.length})`}
-              </button>
+              </motion.button>
             )}
           </div>
         </div>
       </main>
 
       {/* Modal konfirmasi */}
-      {showConfirm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
-            <h3 className="font-semibold text-gray-800 mb-2">Masih ada soal belum dijawab</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              Soal nomor{" "}
-              <span className="font-medium text-gray-700">
-                {unansweredIndices.map((i) => i + 1).join(", ")}
-              </span>{" "}
-              belum kamu jawab. Tetap kumpulkan jawaban?
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowConfirm(false);
-                  setCurrentIndex(unansweredIndices[0]);
-                }}
-                className="flex-1 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg py-2 hover:bg-gray-50"
+      <AnimatePresence>
+        {showConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center p-4"
+            style={{ background: "rgba(27,26,46,0.4)", zIndex: 50 }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-sm"
+              style={{ border: "1px solid var(--color-line)" }}
+            >
+              <h3
+                className="font-bold mb-1"
+                style={{ fontSize: "15px", color: "var(--color-foreground)" }}
               >
-                Kembali ke Soal
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="flex-1 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg py-2 disabled:opacity-50"
-              >
-                {submitting ? "Menilai..." : "Tetap Kumpulkan"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                Masih ada soal belum dijawab
+              </h3>
+              <p className="text-sm mb-4" style={{ color: "var(--color-muted)" }}>
+                Soal nomor{" "}
+                <span
+                  style={{
+                    fontFamily: "var(--font-jetbrains)",
+                    color: "var(--color-warning)",
+                    fontWeight: 600,
+                  }}
+                >
+                  {unansweredIndices.map((i) => i + 1).join(", ")}
+                </span>{" "}
+                belum dijawab. Tetap kumpulkan?
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setShowConfirm(false);
+                    goTo(unansweredIndices[0]);
+                  }}
+                  className="flex-1 text-sm font-medium py-2.5 rounded-xl"
+                  style={{
+                    border: "1px solid var(--color-line)",
+                    color: "var(--color-foreground)",
+                  }}
+                >
+                  Kembali ke Soal
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="flex-1 text-sm font-semibold py-2.5 rounded-xl text-white disabled:opacity-50"
+                  style={{ background: "var(--color-success)" }}
+                >
+                  {submitting ? "Menilai..." : "Tetap Kumpulkan"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

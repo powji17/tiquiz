@@ -2,22 +2,21 @@ import Navbar from "@/app/components/Navbar";
 
 export default function HistoryLoading() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <Navbar />
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-2" />
-        <div className="h-6 w-56 bg-gray-200 rounded animate-pulse mb-1" />
-        <div className="h-4 w-64 bg-gray-200 rounded animate-pulse" />
-      </header>
-      <main className="p-6 max-w-3xl mx-auto">
-        <div className="space-y-3">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center justify-between">
+      <main className="px-6 py-8 max-w-3xl mx-auto">
+        <div className="mb-6">
+          <div className="h-7 w-52 rounded mb-2 animate-pulse" style={{ background: "var(--color-line)" }} />
+          <div className="h-4 w-72 rounded animate-pulse" style={{ background: "var(--color-line)" }} />
+        </div>
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center justify-between bg-white rounded-xl px-4 py-3.5" style={{ border: "1px solid var(--color-line)" }}>
               <div>
-                <div className="h-4 w-40 bg-gray-200 rounded animate-pulse mb-2" />
-                <div className="h-3 w-32 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 w-44 rounded mb-1.5 animate-pulse" style={{ background: "var(--color-line)" }} />
+                <div className="h-3 w-32 rounded animate-pulse" style={{ background: "var(--color-line)" }} />
               </div>
-              <div className="h-6 w-20 bg-gray-200 rounded-full animate-pulse" />
+              <div className="h-6 w-14 rounded-lg animate-pulse" style={{ background: "var(--color-line)" }} />
             </div>
           ))}
         </div>
