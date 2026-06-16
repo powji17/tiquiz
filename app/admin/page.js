@@ -54,7 +54,7 @@ export default async function AdminDashboard() {
 
       {/* Menu kelola */}
       <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-foreground)" }}>
-        Kelola Konten
+        Manajemen Sistem
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -70,6 +70,22 @@ export default async function AdminDashboard() {
             </h3>
             <p className="text-xs" style={{ color: "var(--color-muted)" }}>
               Tambah, ubah, atau hapus topik, kuis, dan soal.
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/users"
+          className="flex bg-white rounded-2xl overflow-hidden block"
+          style={{ border: "1px solid var(--color-line)" }}
+        >
+          <div style={{ width: "4px", flexShrink: 0, background: "#8B5CF6" }} />
+          <div className="p-5">
+            <h3 className="font-bold mb-1" style={{ fontSize: "15px", color: "var(--color-foreground)" }}>
+              Kelola Pengguna
+            </h3>
+            <p className="text-xs" style={{ color: "var(--color-muted)" }}>
+              Tambah, ubah role, reset password, atau hapus akun pengguna.
             </p>
           </div>
         </Link>
