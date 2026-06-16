@@ -68,7 +68,7 @@ export default function DashboardClient({ topics, userName }) {
                       borderRadius: "4px",
                     }}
                   >
-                    {topic.index}
+                    {topic.id}
                   </span>
 
                   {topic.isTopicComplete ? (

@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
           <div style={{ width: "4px", flexShrink: 0, background: "var(--color-primary)" }} />
           <div className="p-5">
             <h3 className="font-bold mb-1" style={{ fontSize: "15px", color: "var(--color-foreground)" }}>
-              Kelola Topik & Kuis
+              Kelola Topik, Kuis dan Soal
             </h3>
             <p className="text-xs" style={{ color: "var(--color-muted)" }}>
               Tambah, ubah, atau hapus topik, kuis, dan soal.
