@@ -7,9 +7,18 @@ export async function middleware(req) {
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const isProtectedPage = pathname.startsWith("/dashboard");
+  const isAdminPage = pathname.startsWith("/admin");
 
   if (isProtectedPage && !token) {
     return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (isAdminPage && !token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (isAdminPage && token?.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   if (isAuthPage && token) {
@@ -20,5 +29,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/register"],
 };

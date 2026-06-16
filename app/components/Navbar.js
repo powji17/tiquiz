@@ -6,7 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const navLinks = [
+const baseNavLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/history", label: "Riwayat" },
   { href: "/profile", label: "Profil" },
@@ -16,6 +16,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks =
+    session?.user?.role === "ADMIN"
+      ? [...baseNavLinks, { href: "/admin", label: "Panel Admin" }]
+      : baseNavLinks;
 
   return (
     <nav style={{ borderBottom: "1px solid var(--color-line)" }} className="bg-white px-6 py-4">
