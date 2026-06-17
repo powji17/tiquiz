@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/app/components/ConfirmModal";
 
 const emptyForm = { name: "", email: "", password: "", role: "USER" };
 
@@ -14,6 +15,7 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const openCreateForm = () => {
     setEditingUser(null);
@@ -74,14 +76,16 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
     }
   };
 
-  const handleDelete = async (user) => {
+  const handleDeleteClick = (user) => {
     if (user.id === currentUserId) {
       toast.error("Tidak bisa menghapus akunmu sendiri.");
       return;
     }
+    setDeleteTarget(user);
+  };
 
-    if (!confirm(`Hapus pengguna "${user.name}"?`)) return;
-
+  const confirmDelete = async () => {
+    const user = deleteTarget;
     setDeletingId(user.id);
 
     try {
@@ -92,12 +96,13 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
         toast.error(data.error || "Gagal menghapus pengguna.");
       } else {
         setUsers((prev) => prev.filter((u) => u.id !== user.id));
-        toast.success("Pengguna berhasil dihapus.");
+        toast.success("Pengguna dan riwayat kuisnya berhasil dihapus.");
       }
     } catch (err) {
       toast.error("Gagal terhubung ke server.");
     } finally {
       setDeletingId(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -314,12 +319,12 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(user)}
-                  disabled={deletingId === user.id || isSelf}
+                  onClick={() => handleDeleteClick(user)}
+                  disabled={isSelf}
                   className="text-xs font-medium disabled:opacity-40"
                   style={{ color: "var(--color-danger)" }}
                 >
-                  {deletingId === user.id ? "..." : "Hapus"}
+                  Hapus
                 </button>
               </div>
             </motion.div>
@@ -327,6 +332,15 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
         })}
         </AnimatePresence>
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title={`Hapus pengguna "${deleteTarget?.name}"?`}
+        description="Seluruh riwayat pengerjaan kuis milik pengguna ini akan ikut terhapus secara permanen."
+        loading={deletingId === deleteTarget?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </main>
   );
 }

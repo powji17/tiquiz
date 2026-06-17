@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/app/components/ConfirmModal";
 
 export default function TopicsAdminClient({ initialTopics }) {
   const [topics, setTopics] = useState(initialTopics);
@@ -13,6 +14,7 @@ export default function TopicsAdminClient({ initialTopics }) {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const openCreateForm = () => {
     setEditingTopic(null);
@@ -73,14 +75,8 @@ export default function TopicsAdminClient({ initialTopics }) {
     }
   };
 
-  const handleDelete = async (topic) => {
-    const confirmMessage =
-      topic._count.quizzes > 0
-        ? `Topik "${topic.name}" memiliki ${topic._count.quizzes} kuis. Menghapus topik ini akan menghapus semua kuis, soal, dan riwayat pengerjaan terkait secara permanen. Lanjutkan?`
-        : `Hapus topik "${topic.name}"?`;
-
-    if (!confirm(confirmMessage)) return;
-
+  const confirmDelete = async () => {
+    const topic = deleteTarget;
     setDeletingId(topic.id);
 
     try {
@@ -97,6 +93,7 @@ export default function TopicsAdminClient({ initialTopics }) {
       toast.error("Gagal terhubung ke server.");
     } finally {
       setDeletingId(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -259,12 +256,11 @@ export default function TopicsAdminClient({ initialTopics }) {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(topic)}
-                  disabled={deletingId === topic.id}
-                  className="text-xs font-medium disabled:opacity-50"
+                  onClick={() => setDeleteTarget(topic)}
+                  className="text-xs font-medium"
                   style={{ color: "var(--color-danger)" }}
                 >
-                  {deletingId === topic.id ? "..." : "Hapus"}
+                  Hapus
                 </button>
               </div>
             </motion.div>
@@ -272,6 +268,19 @@ export default function TopicsAdminClient({ initialTopics }) {
         )}
         </AnimatePresence>
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title={`Hapus topik "${deleteTarget?.name}"?`}
+        description={
+          deleteTarget?._count.quizzes > 0
+            ? `Topik ini memiliki ${deleteTarget._count.quizzes} kuis. Menghapus topik akan menghapus semua kuis, soal, dan riwayat pengerjaan terkait secara permanen.`
+            : "Tindakan ini tidak dapat dibatalkan."
+        }
+        loading={deletingId === deleteTarget?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </main>
   );
 }

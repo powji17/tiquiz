@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/app/components/ConfirmModal";
 
 const emptyForm = {
   text: "",
@@ -22,6 +23,7 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const openCreateForm = () => {
     setEditingQuestion(null);
@@ -93,9 +95,8 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
     }
   };
 
-  const handleDelete = async (question) => {
-    if (!confirm("Hapus soal ini?")) return;
-
+  const confirmDelete = async () => {
+    const question = deleteTarget;
     setDeletingId(question.id);
 
     try {
@@ -112,6 +113,7 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
       toast.error("Gagal terhubung ke server.");
     } finally {
       setDeletingId(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -308,12 +310,11 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(q)}
-                    disabled={deletingId === q.id}
-                    className="text-xs font-medium disabled:opacity-50"
+                    onClick={() => setDeleteTarget(q)}
+                    className="text-xs font-medium"
                     style={{ color: "var(--color-danger)" }}
                   >
-                    {deletingId === q.id ? "..." : "Hapus"}
+                    Hapus
                   </button>
                 </div>
               </div>
@@ -341,6 +342,15 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
         )}
         </AnimatePresence>
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Hapus soal ini?"
+        description="Tindakan ini tidak dapat dibatalkan."
+        loading={deletingId === deleteTarget?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </main>
   );
 }

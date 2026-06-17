@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/app/components/ConfirmModal";
 
 export default function QuizzesAdminClient({ topic, initialQuizzes }) {
   const [quizzes, setQuizzes] = useState(initialQuizzes);
@@ -13,6 +14,7 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const openCreateForm = () => {
     setEditingQuiz(null);
@@ -74,14 +76,8 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
     }
   };
 
-  const handleDelete = async (quiz) => {
-    const confirmMessage =
-      quiz._count.questions > 0
-        ? `Kuis "${quiz.name}" memiliki ${quiz._count.questions} soal dan mungkin sudah dikerjakan oleh pengguna. Menghapus kuis ini akan menghapus semua soal dan riwayat pengerjaan terkait secara permanen. Lanjutkan?`
-        : `Hapus kuis "${quiz.name}"?`;
-
-    if (!confirm(confirmMessage)) return;
-
+  const confirmDelete = async () => {
+    const quiz = deleteTarget;
     setDeletingId(quiz.id);
 
     try {
@@ -98,6 +94,7 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
       toast.error("Gagal terhubung ke server.");
     } finally {
       setDeletingId(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -258,12 +255,11 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(quiz)}
-                    disabled={deletingId === quiz.id}
-                    className="text-xs font-medium disabled:opacity-50"
+                    onClick={() => setDeleteTarget(quiz)}
+                    className="text-xs font-medium"
                     style={{ color: "var(--color-danger)" }}
                   >
-                    {deletingId === quiz.id ? "..." : "Hapus"}
+                    Hapus
                   </button>
                 </div>
               </motion.div>
@@ -271,6 +267,19 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
           )}
         </AnimatePresence>
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title={`Hapus kuis "${deleteTarget?.name}"?`}
+        description={
+          deleteTarget?._count.questions > 0
+            ? `Kuis ini memiliki ${deleteTarget._count.questions} soal dan mungkin sudah dikerjakan pengguna. Menghapus kuis akan menghapus semua soal dan riwayat pengerjaan terkait secara permanen.`
+            : "Tindakan ini tidak dapat dibatalkan."
+        }
+        loading={deletingId === deleteTarget?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </main>
   );
 }
