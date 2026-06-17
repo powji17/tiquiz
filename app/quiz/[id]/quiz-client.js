@@ -369,7 +369,7 @@ export default function QuizClient({ quiz }) {
         </div>
 
         {/* Kartu soal */}
-        <div className="w-full max-w-2xl flex-1 flex flex-col">
+        <div className="w-full max-w-2xl flex flex-col">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentIndex}
