@@ -29,6 +29,9 @@ export const metadata = {
     title: "TIQuiz",
     description: "Belajar lebih terukur, hasil lebih nyata.",
   },
+  verification: {
+    google: "Sn-FJdc2L82cUzF8mAzyNIfpaXTq6aSodc-TpwPpn4Y",
+  },
 };
 
 export default function RootLayout({ children }) {
