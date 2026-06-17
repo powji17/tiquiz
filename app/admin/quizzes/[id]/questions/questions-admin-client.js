@@ -134,12 +134,15 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
         <div>
           <Link
             href={`/admin/topics/${quiz.topicId}/quizzes`}
-            className="text-sm"
+            className="inline-flex items-center gap-1 text-sm mb-1"
             style={{ color: "var(--color-muted)" }}
           >
-            ← Kuis · {quiz.topicName}
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kuis · {quiz.topicName}
           </Link>
-          <h1 className="text-xl font-bold mt-1" style={{ color: "var(--color-foreground)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--color-foreground)" }}>
             Soal · {quiz.name}
           </h1>
         </div>

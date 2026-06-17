@@ -111,10 +111,17 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
     <main className="px-6 py-8 max-w-3xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-6 flex items-center justify-between">
         <div>
-          <Link href="/admin" className="text-sm" style={{ color: "var(--color-muted)" }}>
-            ← Panel Admin
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1 text-sm mb-1"
+            style={{ color: "var(--color-muted)" }}
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Panel Admin
           </Link>
-          <h1 className="text-xl font-bold mt-1" style={{ color: "var(--color-foreground)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--color-foreground)" }}>
             Kelola Pengguna
           </h1>
         </div>

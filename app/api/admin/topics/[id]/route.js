@@ -51,9 +51,11 @@ export async function DELETE(req, { params }) {
 
   try {
     await prisma.topic.delete({ where: { id: topicId } });
-    return NextResponse.json({ message: "Topik berhasil dihapus." });
+    return NextResponse.json({
+      message: "Topik, seluruh kuis, soal, dan riwayat pengerjaannya berhasil dihapus.",
+    });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Gagal menghapus topik. Pastikan tidak ada kuis yang terkait." }, { status: 500 });
+    return NextResponse.json({ error: "Gagal menghapus topik." }, { status: 500 });
   }
 }

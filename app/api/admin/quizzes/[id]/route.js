@@ -43,16 +43,10 @@ export async function DELETE(req, { params }) {
   const quizId = parseInt(id);
 
   try {
-    const questionCount = await prisma.question.count({ where: { quizId } });
-    if (questionCount > 0) {
-      return NextResponse.json(
-        { error: "Hapus semua soal di kuis ini terlebih dahulu." },
-        { status: 400 }
-      );
-    }
-
     await prisma.quiz.delete({ where: { id: quizId } });
-    return NextResponse.json({ message: "Kuis berhasil dihapus." });
+    return NextResponse.json({
+      message: "Kuis, seluruh soal, dan riwayat pengerjaannya berhasil dihapus.",
+    });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Gagal menghapus kuis." }, { status: 500 });

@@ -75,12 +75,12 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
   };
 
   const handleDelete = async (quiz) => {
-    if (quiz._count.questions > 0) {
-      toast.error("Hapus semua soal di kuis ini terlebih dahulu.");
-      return;
-    }
+    const confirmMessage =
+      quiz._count.questions > 0
+        ? `Kuis "${quiz.name}" memiliki ${quiz._count.questions} soal dan mungkin sudah dikerjakan oleh pengguna. Menghapus kuis ini akan menghapus semua soal dan riwayat pengerjaan terkait secara permanen. Lanjutkan?`
+        : `Hapus kuis "${quiz.name}"?`;
 
-    if (!confirm(`Hapus kuis "${quiz.name}"?`)) return;
+    if (!confirm(confirmMessage)) return;
 
     setDeletingId(quiz.id);
 
@@ -92,7 +92,7 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
         toast.error(data.error || "Gagal menghapus kuis.");
       } else {
         setQuizzes((prev) => prev.filter((q) => q.id !== quiz.id));
-        toast.success("Kuis berhasil dihapus.");
+        toast.success("Kuis, soal, dan riwayatnya berhasil dihapus.");
       }
     } catch (err) {
       toast.error("Gagal terhubung ke server.");
@@ -116,10 +116,17 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
         className="mb-6 flex items-center justify-between"
       >
         <div>
-          <Link href="/admin/topics" className="text-sm" style={{ color: "var(--color-muted)" }}>
-            ← Kelola Topik
+          <Link
+            href="/admin/topics"
+            className="inline-flex items-center gap-1 text-sm mb-1"
+            style={{ color: "var(--color-muted)" }}
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kelola Topik
           </Link>
-          <h1 className="text-xl font-bold mt-1" style={{ color: "var(--color-foreground)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--color-foreground)" }}>
             Kuis · {topic.name}
           </h1>
         </div>

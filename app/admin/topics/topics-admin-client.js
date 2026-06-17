@@ -74,12 +74,12 @@ export default function TopicsAdminClient({ initialTopics }) {
   };
 
   const handleDelete = async (topic) => {
-    if (topic._count.quizzes > 0) {
-      toast.error("Hapus semua kuis di topik ini terlebih dahulu.");
-      return;
-    }
+    const confirmMessage =
+      topic._count.quizzes > 0
+        ? `Topik "${topic.name}" memiliki ${topic._count.quizzes} kuis. Menghapus topik ini akan menghapus semua kuis, soal, dan riwayat pengerjaan terkait secara permanen. Lanjutkan?`
+        : `Hapus topik "${topic.name}"?`;
 
-    if (!confirm(`Hapus topik "${topic.name}"?`)) return;
+    if (!confirm(confirmMessage)) return;
 
     setDeletingId(topic.id);
 
@@ -91,7 +91,7 @@ export default function TopicsAdminClient({ initialTopics }) {
         toast.error(data.error || "Gagal menghapus topik.");
       } else {
         setTopics((prev) => prev.filter((t) => t.id !== topic.id));
-        toast.success("Topik berhasil dihapus.");
+        toast.success("Topik, kuis, soal, dan riwayatnya berhasil dihapus.");
       }
     } catch (err) {
       toast.error("Gagal terhubung ke server.");
@@ -115,10 +115,17 @@ export default function TopicsAdminClient({ initialTopics }) {
         className="mb-6 flex items-center justify-between"
       >
         <div>
-          <Link href="/admin" className="text-sm" style={{ color: "var(--color-muted)" }}>
-            ← Panel Admin
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1 text-sm mb-1"
+            style={{ color: "var(--color-muted)" }}
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Panel Admin
           </Link>
-          <h1 className="text-xl font-bold mt-1" style={{ color: "var(--color-foreground)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--color-foreground)" }}>
             Kelola Topik
           </h1>
         </div>
