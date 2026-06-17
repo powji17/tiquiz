@@ -108,7 +108,12 @@ export default function TopicsAdminClient({ initialTopics }) {
 
   return (
     <main className="px-6 py-8 max-w-3xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6 flex items-center justify-between"
+      >
         <div>
           <Link href="/admin" className="text-sm" style={{ color: "var(--color-muted)" }}>
             ← Panel Admin
@@ -126,7 +131,7 @@ export default function TopicsAdminClient({ initialTopics }) {
         >
           + Tambah Topik
         </motion.button>
-      </div>
+      </motion.div>
 
       {/* Form tambah/edit */}
       <AnimatePresence>
@@ -198,14 +203,25 @@ export default function TopicsAdminClient({ initialTopics }) {
 
       {/* Daftar topik */}
       <div className="space-y-2">
+        <AnimatePresence>
         {topics.length === 0 ? (
-          <p className="text-sm text-center py-10" style={{ color: "var(--color-muted)" }}>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-sm text-center py-10"
+            style={{ color: "var(--color-muted)" }}
+          >
             Belum ada topik. Klik "Tambah Topik" untuk membuat yang pertama.
-          </p>
+          </motion.p>
         ) : (
-          topics.map((topic) => (
-            <div
+          topics.map((topic, i) => (
+            <motion.div
               key={topic.id}
+              layout
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, delay: i * 0.05 }}
               className="flex items-center justify-between bg-white rounded-xl px-4 py-3"
               style={{ border: "1px solid var(--color-line)" }}
             >
@@ -244,9 +260,10 @@ export default function TopicsAdminClient({ initialTopics }) {
                   {deletingId === topic.id ? "..." : "Hapus"}
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))
         )}
+        </AnimatePresence>
       </div>
     </main>
   );

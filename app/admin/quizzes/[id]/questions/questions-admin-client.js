@@ -130,7 +130,7 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
 
   return (
     <main className="px-6 py-8 max-w-3xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-6 flex items-center justify-between">
         <div>
           <Link
             href={`/admin/topics/${quiz.topicId}/quizzes`}
@@ -152,7 +152,7 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
         >
           + Tambah Soal
         </motion.button>
-      </div>
+      </motion.div>
 
       {/* Form tambah/edit soal */}
       <AnimatePresence>
@@ -270,14 +270,25 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
 
       {/* Daftar soal */}
       <div className="space-y-3">
+        <AnimatePresence>
         {questions.length === 0 ? (
-          <p className="text-sm text-center py-10" style={{ color: "var(--color-muted)" }}>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-sm text-center py-10"
+            style={{ color: "var(--color-muted)" }}
+          >
             Belum ada soal di kuis ini. Klik "Tambah Soal" untuk membuat yang pertama.
-          </p>
+          </motion.p>
         ) : (
           questions.map((q, idx) => (
-            <div
+            <motion.div
               key={q.id}
+              layout
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, delay: idx * 0.05 }}
               className="bg-white rounded-2xl p-4"
               style={{ border: "1px solid var(--color-line)" }}
             >
@@ -322,9 +333,10 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           ))
         )}
+        </AnimatePresence>
       </div>
     </main>
   );

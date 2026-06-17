@@ -109,7 +109,7 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
 
   return (
     <main className="px-6 py-8 max-w-3xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-6 flex items-center justify-between">
         <div>
           <Link href="/admin" className="text-sm" style={{ color: "var(--color-muted)" }}>
             ← Panel Admin
@@ -127,7 +127,7 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
         >
           + Tambah Pengguna
         </motion.button>
-      </div>
+      </motion.div>
 
       {/* Form tambah/edit */}
       <AnimatePresence>
@@ -250,7 +250,8 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
 
       {/* Daftar pengguna */}
       <div className="space-y-2">
-        {users.map((user) => {
+        <AnimatePresence>
+        {users.map((user, i) => {
           const isSelf = user.id === currentUserId;
           const joinDate = new Date(user.createdAt).toLocaleDateString("id-ID", {
             day: "numeric",
@@ -259,8 +260,13 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
           });
 
           return (
-            <div
+            <motion.div
               key={user.id}
+              layout
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, delay: i * 0.05 }}
               className="flex items-center justify-between bg-white rounded-xl px-4 py-3"
               style={{ border: "1px solid var(--color-line)" }}
             >
@@ -309,9 +315,10 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
                   {deletingId === user.id ? "..." : "Hapus"}
                 </button>
               </div>
-            </div>
+            </motion.div>
           );
         })}
+        </AnimatePresence>
       </div>
     </main>
   );

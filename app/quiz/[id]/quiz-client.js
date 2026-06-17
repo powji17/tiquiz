@@ -12,6 +12,7 @@ export default function QuizClient({ quiz }) {
   const [result, setResult] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [direction, setDirection] = useState(1);
 
   const currentQuestion = questions[currentIndex];
@@ -298,14 +299,14 @@ export default function QuizClient({ quiz }) {
               {currentIndex + 1}/{questions.length}
             </p>
           </div>
-          <Link
-            href={backHref}
+          <button
+            onClick={() => setShowExitConfirm(true)}
             className="text-sm shrink-0"
             style={{ color: "var(--color-muted)" }}
           >
             <span className="hidden sm:inline">Keluar dari Kuis</span>
             <span className="sm:hidden">Keluar</span>
-          </Link>
+          </button>
         </div>
 
         {/* Progress bar */}
@@ -465,7 +466,7 @@ export default function QuizClient({ quiz }) {
         </div>
       </main>
 
-      {/* Modal konfirmasi */}
+      {/* Modal konfirmasi submit */}
       <AnimatePresence>
         {showConfirm && (
           <motion.div
@@ -524,6 +525,61 @@ export default function QuizClient({ quiz }) {
                 >
                   {submitting ? "Menilai..." : "Tetap Kumpulkan"}
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal konfirmasi keluar */}
+      <AnimatePresence>
+        {showExitConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center p-4"
+            style={{ background: "rgba(27,26,46,0.4)", zIndex: 50 }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-sm"
+              style={{ border: "1px solid var(--color-line)" }}
+            >
+              <h3
+                className="font-bold mb-1"
+                style={{ fontSize: "15px", color: "var(--color-foreground)" }}
+              >
+                Keluar dari kuis?
+              </h3>
+              <p className="text-sm mb-4" style={{ color: "var(--color-muted)" }}>
+                Progress jawaban yang sudah kamu isi{" "}
+                <span style={{ color: "var(--color-danger)", fontWeight: 600 }}>
+                  tidak akan disimpan
+                </span>{" "}
+                dan akan hilang jika kamu keluar sekarang.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowExitConfirm(false)}
+                  className="flex-1 text-sm font-medium py-2.5 rounded-xl"
+                  style={{
+                    border: "1px solid var(--color-line)",
+                    color: "var(--color-foreground)",
+                  }}
+                >
+                  Lanjutkan Kuis
+                </button>
+                <Link
+                  href={backHref}
+                  className="flex-1 text-sm font-semibold py-2.5 rounded-xl text-white text-center"
+                  style={{ background: "var(--color-danger)" }}
+                >
+                  Ya, Keluar
+                </Link>
               </div>
             </motion.div>
           </motion.div>

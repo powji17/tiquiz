@@ -109,7 +109,12 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
 
   return (
     <main className="px-6 py-8 max-w-3xl mx-auto">
-      <div className="mb-6 flex items-center justify-between">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6 flex items-center justify-between"
+      >
         <div>
           <Link href="/admin/topics" className="text-sm" style={{ color: "var(--color-muted)" }}>
             ← Kelola Topik
@@ -127,7 +132,7 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
         >
           + Tambah Kuis
         </motion.button>
-      </div>
+      </motion.div>
 
       <AnimatePresence>
         {showForm && (
@@ -197,55 +202,67 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
       </AnimatePresence>
 
       <div className="space-y-2">
-        {quizzes.length === 0 ? (
-          <p className="text-sm text-center py-10" style={{ color: "var(--color-muted)" }}>
-            Belum ada kuis di topik ini. Klik "Tambah Kuis" untuk membuat yang pertama.
-          </p>
-        ) : (
-          quizzes.map((quiz) => (
-            <div
-              key={quiz.id}
-              className="flex items-center justify-between bg-white rounded-xl px-4 py-3"
-              style={{ border: "1px solid var(--color-line)" }}
+        <AnimatePresence>
+          {quizzes.length === 0 ? (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm text-center py-10"
+              style={{ color: "var(--color-muted)" }}
             >
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-sm truncate" style={{ color: "var(--color-foreground)" }}>
-                  {quiz.name}
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
-                  {quiz.description || "Tanpa deskripsi"} ·{" "}
-                  <span style={{ fontFamily: "var(--font-jetbrains)" }}>
-                    {quiz._count.questions} soal
-                  </span>
-                </p>
-              </div>
-              <div className="flex items-center gap-3 ml-3 shrink-0">
-                <Link
-                  href={`/admin/quizzes/${quiz.id}/questions`}
-                  className="text-xs font-medium"
-                  style={{ color: "var(--color-primary)" }}
-                >
-                  Kelola Soal
-                </Link>
-                <button
-                  onClick={() => openEditForm(quiz)}
-                  className="text-xs font-medium"
-                  style={{ color: "var(--color-muted)" }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(quiz)}
-                  disabled={deletingId === quiz.id}
-                  className="text-xs font-medium disabled:opacity-50"
-                  style={{ color: "var(--color-danger)" }}
-                >
-                  {deletingId === quiz.id ? "..." : "Hapus"}
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+              Belum ada kuis di topik ini. Klik "Tambah Kuis" untuk membuat yang pertama.
+            </motion.p>
+          ) : (
+            quizzes.map((quiz, i) => (
+              <motion.div
+                key={quiz.id}
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
+                className="flex items-center justify-between bg-white rounded-xl px-4 py-3"
+                style={{ border: "1px solid var(--color-line)" }}
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-sm truncate" style={{ color: "var(--color-foreground)" }}>
+                    {quiz.name}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--color-muted)" }}>
+                    {quiz.description || "Tanpa deskripsi"} ·{" "}
+                    <span style={{ fontFamily: "var(--font-jetbrains)" }}>
+                      {quiz._count.questions} soal
+                    </span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 ml-3 shrink-0">
+                  <Link
+                    href={`/admin/quizzes/${quiz.id}/questions`}
+                    className="text-xs font-medium"
+                    style={{ color: "var(--color-primary)" }}
+                  >
+                    Kelola Soal
+                  </Link>
+                  <button
+                    onClick={() => openEditForm(quiz)}
+                    className="text-xs font-medium"
+                    style={{ color: "var(--color-muted)" }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(quiz)}
+                    disabled={deletingId === quiz.id}
+                    className="text-xs font-medium disabled:opacity-50"
+                    style={{ color: "var(--color-danger)" }}
+                  >
+                    {deletingId === quiz.id ? "..." : "Hapus"}
+                  </button>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );
