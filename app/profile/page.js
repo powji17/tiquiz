@@ -27,6 +27,7 @@ export default async function ProfilePage() {
     orderBy: { name: "asc" },
   });
 
+  // Hitung statistik per topik
   const topicStats = topics.map((topic, index) => {
     const totalQuizzes = topic.quizzes.length;
     const attempted = topic.quizzes.filter((q) => q.attempts.length > 0);
@@ -76,12 +77,13 @@ export default async function ProfilePage() {
   const completedAll = topicStats.reduce((sum, t) => sum + t.completedCount, 0);
   const perfectAll = topicStats.reduce((sum, t) => sum + t.perfectCount, 0);
   const perfectTopicsCount = topicStats.filter((t) => t.isTopicPerfect).length;
-  const topicsWithScore = topicStats.filter((t) => t.avgPercentage !== null);
+
+  const allAttemptedQuizzes = topics.flatMap((t) => t.quizzes).filter((q) => q.attempts.length > 0);
   const overallAvg =
-    topicsWithScore.length > 0
+    allAttemptedQuizzes.length > 0
       ? Math.round(
-          topicsWithScore.reduce((sum, t) => sum + t.avgPercentage, 0) /
-            topicsWithScore.length
+          allAttemptedQuizzes.reduce((sum, q) => sum + (q.attempts[0].score / q.attempts[0].total) * 100, 0) /
+            allAttemptedQuizzes.length
         )
       : null;
 

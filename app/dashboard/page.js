@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import Navbar from "@/app/components/Navbar";
 import DashboardClient from "./dashboard-client";
 
@@ -51,10 +50,65 @@ export default async function DashboardPage() {
     };
   });
 
+  // Ringkasan progress keseluruhan
+  const allQuizzes = topics.flatMap((t) => t.quizzes);
+  const totalQuizzesAll = allQuizzes.length;
+  const attemptedQuizzes = allQuizzes.filter((q) => q.attempts.length > 0);
+  const completedAll = attemptedQuizzes.length;
+  const perfectAll = attemptedQuizzes.filter((q) => q.attempts[0].score === q.attempts[0].total).length;
+  const overallAvg =
+    attemptedQuizzes.length > 0
+      ? Math.round(
+          attemptedQuizzes.reduce((sum, q) => sum + (q.attempts[0].score / q.attempts[0].total) * 100, 0) /
+            attemptedQuizzes.length
+        )
+      : null;
+
+  const perfectTopicsCount = topicsWithStats.filter((t) => t.isTopicComplete).length;
+
+  // "Lanjutkan Belajar": kuis yang sudah dikerjakan tapi belum 100%
+  const continueQuiz = topics
+    .flatMap((topic) =>
+      topic.quizzes
+        .filter((q) => q.attempts.length > 0 && q.attempts[0].score !== q.attempts[0].total)
+        .map((q) => ({
+          id: q.id,
+          name: q.name,
+          topicName: topic.name,
+          bestScore: q.attempts[0].score,
+          bestTotal: q.attempts[0].total,
+        }))
+    )
+    .sort((a, b) => b.bestScore / b.bestTotal - a.bestScore / a.bestTotal)[0] || null;
+
+  // Aktivitas terakhir: 3 attempt paling baru
+  const recentAttempts = await prisma.quizAttempt.findMany({
+    where: { userId },
+    include: { quiz: { include: { topic: { select: { name: true } } } } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+
+  const recentActivity = recentAttempts.map((a) => ({
+    id: a.id,
+    quizId: a.quiz.id,
+    quizName: a.quiz.name,
+    topicName: a.quiz.topic.name,
+    score: a.score,
+    total: a.total,
+    createdAt: a.createdAt.toISOString(),
+  }));
+
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <Navbar />
-      <DashboardClient topics={topicsWithStats} userName={session.user.name} />
+      <DashboardClient
+        topics={topicsWithStats}
+        userName={session.user.name}
+        summary={{ totalQuizzesAll, completedAll, perfectAll, overallAvg, perfectTopicsCount, totalTopics: topicsWithStats.length }}
+        continueQuiz={continueQuiz}
+        recentActivity={recentActivity}
+      />
     </div>
   );
 }

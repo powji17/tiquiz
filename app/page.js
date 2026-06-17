@@ -1,13 +1,14 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import LandingClient from "./landing-client";
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions);
+  const topics = await prisma.topic.findMany({
+    include: { _count: { select: { quizzes: true } } },
+    orderBy: { name: "asc" },
+    take: 6,
+  });
 
-  if (session) {
-    redirect("/dashboard");
-  } else {
-    redirect("/login");
-  }
+  const totalQuestions = await prisma.question.count();
+
+  return <LandingClient topics={topics} totalQuestions={totalQuestions} />;
 }

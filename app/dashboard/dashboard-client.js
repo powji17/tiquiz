@@ -9,14 +9,14 @@ const stackColors = {
   empty: "var(--color-stack-empty)",
 };
 
-export default function DashboardClient({ topics, userName }) {
+export default function DashboardClient({ topics, userName, summary, continueQuiz, recentActivity }) {
   return (
     <main className="px-6 py-8 max-w-5xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mb-8"
+        className="mb-6"
       >
         <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--color-foreground)" }}>
           Halo, {userName}! 👋
@@ -26,13 +26,126 @@ export default function DashboardClient({ topics, userName }) {
         </p>
       </motion.div>
 
+      {/* Ringkasan progress */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        {[
+          { label: "Kuis Dikerjakan", value: `${summary.completedAll}/${summary.totalQuizzesAll}`, color: "var(--color-primary)" },
+          { label: "Kuis Sempurna", value: summary.perfectAll, color: "var(--color-success)" },
+          { label: "Topik Tuntas", value: `${summary.perfectTopicsCount}/${summary.totalTopics}`, color: "#0EA5C9" },
+          { label: "Rata-rata Skor", value: summary.overallAvg !== null ? `${summary.overallAvg}%` : "—", color: "#8B5CF6" },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: i * 0.06 }}
+            className="bg-white rounded-2xl p-4 text-center"
+            style={{ border: "1px solid var(--color-line)" }}
+          >
+            <p
+              className="font-bold mb-1"
+              style={{ fontFamily: "var(--font-jetbrains)", fontSize: "20px", color: stat.color }}
+            >
+              {stat.value}
+            </p>
+            <p className="text-xs" style={{ color: "var(--color-muted)" }}>
+              {stat.label}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Lanjutkan Belajar + Aktivitas Terakhir */}
+      {(continueQuiz || recentActivity.length > 0) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          {continueQuiz && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            >
+              <Link
+                href={`/quiz/${continueQuiz.id}`}
+                className="flex bg-white rounded-2xl overflow-hidden h-full block items-center"
+                style={{ border: "1px solid var(--color-warning)" }}
+              >
+                <div style={{ width: "4px", alignSelf: "stretch", flexShrink: 0, background: "var(--color-warning)" }} />
+                <div className="p-5">
+                  <p
+                    className="text-xs font-semibold mb-2"
+                    style={{ color: "var(--color-warning)" }}
+                  >
+                    ▶ Lanjutkan Belajar
+                  </p>
+                  <h3 className="font-bold mb-1" style={{ fontSize: "15px", color: "var(--color-foreground)" }}>
+                    {continueQuiz.name}
+                  </h3>
+                  <p className="text-xs" style={{ color: "var(--color-muted)" }}>
+                    {continueQuiz.topicName} ·{" "}
+                    <span style={{ fontFamily: "var(--font-jetbrains)", color: "var(--color-warning)", fontWeight: 600 }}>
+                      Skor terbaik: {continueQuiz.bestScore}/{continueQuiz.bestTotal}
+                    </span>
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
+          )}
+
+          {recentActivity.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.25 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="bg-white rounded-2xl p-5"
+              style={{ border: "1px solid var(--color-line)" }}
+            >
+              <p className="text-xs font-semibold mb-3" style={{ color: "var(--color-muted)" }}>
+                Aktivitas Terakhir
+              </p>
+              <div className="space-y-2.5">
+                {recentActivity.map((act) => {
+                  const isPerfect = act.score === act.total;
+                  return (
+                    <Link
+                      key={act.id}
+                      href={`/quiz/${act.quizId}`}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="truncate flex-1" style={{ color: "var(--color-foreground)" }}>
+                        {act.quizName}
+                      </span>
+                      <span
+                        className="text-xs font-semibold ml-2 shrink-0"
+                        style={{
+                          fontFamily: "var(--font-jetbrains)",
+                          color: isPerfect ? "var(--color-success)" : "var(--color-warning)",
+                        }}
+                      >
+                        {act.score}/{act.total}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* Grid topik */}
+      <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-foreground)" }}>
+        Pilih Topik
+      </h2>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {topics.map((topic, i) => (
           <motion.div
             key={topic.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: i * 0.08 }}
+            transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
           >
             <Link
@@ -43,19 +156,15 @@ export default function DashboardClient({ topics, userName }) {
                 transition: "border-color 0.2s",
               }}
             >
-              {/* Accent bar kiri */}
               <div
                 style={{
                   width: "4px",
                   flexShrink: 0,
-                  background: topic.isTopicComplete
-                    ? "var(--color-success)"
-                    : "var(--color-primary)",
+                  background: topic.isTopicComplete ? "var(--color-success)" : "var(--color-primary)",
                 }}
               />
 
               <div className="p-5 flex flex-col flex-1 min-w-0">
-                {/* Header: index + status */}
                 <div className="flex items-center justify-between mb-3">
                   <span
                     style={{
@@ -68,7 +177,7 @@ export default function DashboardClient({ topics, userName }) {
                       borderRadius: "4px",
                     }}
                   >
-                    {topic.id}
+                    {topic.index}
                   </span>
 
                   {topic.isTopicComplete ? (
@@ -97,7 +206,6 @@ export default function DashboardClient({ topics, userName }) {
                   )}
                 </div>
 
-                {/* Nama & deskripsi */}
                 <h2
                   className="font-bold mb-1 truncate"
                   style={{ fontSize: "15px", color: "var(--color-foreground)" }}
@@ -111,14 +219,13 @@ export default function DashboardClient({ topics, userName }) {
                   {topic.description}
                 </p>
 
-                {/* Stack-bar progress */}
                 <div className="flex gap-1.5 items-end" style={{ height: "20px" }}>
                   {topic.quizStatuses.map((status, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ scaleY: 0 }}
                       animate={{ scaleY: 1 }}
-                      transition={{ duration: 0.35, delay: i * 0.08 + idx * 0.07 }}
+                      transition={{ duration: 0.35, delay: 0.3 + i * 0.08 + idx * 0.07 }}
                       style={{
                         width: "8px",
                         height: status === "perfect" ? "100%" : status === "partial" ? "60%" : "30%",
