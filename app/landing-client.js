@@ -101,7 +101,59 @@ export default function LandingClient({ topics, totalQuestions }) {
       </motion.nav>
 
       {/* Hero */}
-      <section className="px-6 pt-16 pb-20 max-w-3xl mx-auto text-center">
+      <section
+        className="relative px-6 pt-16 pb-20 max-w-3xl mx-auto text-center overflow-hidden"
+        style={{ isolation: "isolate" }}
+      >
+        {/* Background: grid pattern */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--color-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-line) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+            maskImage: "radial-gradient(ellipse 60% 60% at 50% 30%, black 30%, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(ellipse 60% 60% at 50% 30%, black 30%, transparent 80%)",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Background: floating code elements */}
+        {[
+          { text: "{ }", top: "8%", left: "6%", size: "28px", delay: 0, duration: 7 },
+          { text: "[ ]", top: "65%", left: "10%", size: "22px", delay: 1.2, duration: 8 },
+          { text: "01", top: "15%", left: "88%", size: "16px", delay: 0.6, duration: 6.5 },
+          { text: "</>", top: "75%", left: "85%", size: "20px", delay: 1.8, duration: 7.5 },
+          { text: "===", top: "40%", left: "92%", size: "16px", delay: 0.3, duration: 9 },
+          { text: "( )", top: "85%", left: "45%", size: "18px", delay: 2.2, duration: 6 },
+          { text: "10", top: "5%", left: "35%", size: "16px", delay: 1.5, duration: 8.5 },
+        ].map((el, i) => (
+          <motion.span
+            key={i}
+            className="absolute hidden sm:block select-none"
+            style={{
+              top: el.top,
+              left: el.left,
+              fontFamily: "var(--font-jetbrains)",
+              fontSize: el.size,
+              fontWeight: 700,
+              color: "var(--color-primary)",
+              opacity: 0.18,
+              zIndex: 0,
+            }}
+            animate={{ y: [0, -14, 0], opacity: [0.18, 0.3, 0.18] }}
+            transition={{
+              duration: el.duration,
+              delay: el.delay,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            {el.text}
+          </motion.span>
+        ))}
+
+        <div className="relative" style={{ zIndex: 1 }}>
         <motion.span
           initial={{ opacity: 0, y: 10, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -168,6 +220,7 @@ export default function LandingClient({ topics, totalQuestions }) {
             </motion.div>
           )}
         </motion.div>
+        </div>
       </section>
 
       {/* Fitur */}
