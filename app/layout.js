@@ -14,7 +14,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata = {
   title: "TIQuiz",
-  description: "TIQuiz membantu mahasiswa Teknik Informatika menguji pemahaman materi kuliah lewat kuis interaktif, lengkap dengan pembahasan dan pelacakan progress per topik.",
+  description: "TIQuiz membantu kamu menguji pemahaman ilmu komputer lewat kuis interaktif, lengkap dengan pembahasan dan pelacakan progress per topik.",
   metadataBase: new URL("https://tiquiz.vercel.app"),
   openGraph: {
     title: "TIQuiz",

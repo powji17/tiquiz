@@ -21,8 +21,8 @@ const features = [
     color: "#8B5CF6",
   },
   {
-    title: "Riwayat Pengerjaan",
-    desc: "Lihat jejak semua percobaan kuismu, kapan dikerjakan, dan bagaimana perkembangannya.",
+    title: "Leaderboard Kuis",
+    desc: "Lihat peringkatmu berdasarkan skor dan kecepatan di setiap kuis, lalu bersaing sehat dengan teman sekelas.",
     color: "#0EA5C9",
   },
 ];
@@ -169,7 +169,7 @@ export default function LandingClient({ topics, totalQuestions }) {
             display: "inline-block",
           }}
         >
-          UNTUK MAHASISWA TEKNIK INFORMATIKA
+          BELAJAR ILMU KOMPUTER, SIAPA SAJA BISA
         </motion.span>
 
         <motion.h1
@@ -189,7 +189,7 @@ export default function LandingClient({ topics, totalQuestions }) {
           className="text-sm sm:text-base mb-8 max-w-lg mx-auto"
           style={{ color: "var(--color-muted)" }}
         >
-          TIQuiz membantu kamu menguji pemahaman materi kuliah lewat kuis interaktif,
+          TIQuiz membantu kamu menguji pemahaman ilmu komputer lewat kuis interaktif,
           lengkap dengan pembahasan dan pelacakan progress per topik.
         </motion.p>
 
@@ -374,7 +374,7 @@ export default function LandingClient({ topics, totalQuestions }) {
         className="px-6 py-6 text-center"
       >
         <p className="text-xs" style={{ color: "var(--color-muted)" }}>
-          TIQuiz · Dibuat untuk mahasiswa Teknik Informatika
+          TIQuiz · Tempat belajar ilmu komputer untuk siapa saja
         </p>
       </motion.footer>
     </div>
