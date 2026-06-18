@@ -10,7 +10,13 @@ export async function POST(req) {
   }
 
   try {
-    const { quizId, answers } = await req.json();
+    const { quizId, answers, durationSeconds } = await req.json();
+    const userId = parseInt(session.user.id);
+
+    const existingAttempt = await prisma.quizAttempt.findFirst({
+      where: { userId, quizId: parseInt(quizId) },
+    });
+    const isFirstAttempt = !existingAttempt;
 
     const questions = await prisma.question.findMany({
       where: { quizId: parseInt(quizId) },
@@ -50,14 +56,16 @@ export async function POST(req) {
 
     await prisma.quizAttempt.create({
       data: {
-        userId: parseInt(session.user.id),
+        userId,
         quizId: parseInt(quizId),
         score,
         total: questions.length,
+        durationSeconds: durationSeconds ?? null,
+        isFirstAttempt,
       },
     });
 
-    return NextResponse.json({ score, total: questions.length, results });
+    return NextResponse.json({ score, total: questions.length, results, isFirstAttempt });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Gagal menyimpan hasil kuis." }, { status: 500 });

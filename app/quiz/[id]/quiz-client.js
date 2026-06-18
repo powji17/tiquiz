@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import Leaderboard from "./leaderboard";
 
 export default function QuizClient({ quiz }) {
   const { questions } = quiz;
@@ -14,6 +15,30 @@ export default function QuizClient({ quiz }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [direction, setDirection] = useState(1);
+  const startTimeRef = useRef(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+
+    const interval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (result) return;
+
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [result]);
 
   const currentQuestion = questions[currentIndex];
   const options = currentQuestion
@@ -52,11 +77,15 @@ export default function QuizClient({ quiz }) {
     setShowConfirm(false);
     setSubmitting(true);
 
+    const durationSeconds = startTimeRef.current
+      ? Math.round((Date.now() - startTimeRef.current) / 1000)
+      : null;
+
     try {
       const res = await fetch("/api/quiz/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quizId: quiz.id, answers }),
+        body: JSON.stringify({ quizId: quiz.id, answers, durationSeconds }),
       });
 
       const data = await res.json();
@@ -76,6 +105,12 @@ export default function QuizClient({ quiz }) {
   const isLast = currentIndex === questions.length - 1;
   const answeredCount = Object.keys(answers).length;
 
+  const formatStopwatch = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
   // ===== Hasil Kuis =====
   if (result) {
     const percentage = Math.round((result.score / result.total) * 100);
@@ -87,7 +122,7 @@ export default function QuizClient({ quiz }) {
           className="bg-white px-4 sm:px-6 py-4"
           style={{ borderBottom: "1px solid var(--color-line)" }}
         >
-          <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="max-w-5xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span
                 style={{
@@ -112,7 +147,9 @@ export default function QuizClient({ quiz }) {
           </div>
         </header>
 
-        <main className="px-4 sm:px-6 py-8 max-w-2xl mx-auto">
+        <main className="px-4 sm:px-6 py-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
+          <div className="max-w-2xl w-full mx-auto lg:max-w-none lg:mx-0">
           {/* Score card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -264,6 +301,13 @@ export default function QuizClient({ quiz }) {
               Kembali ke Daftar Kuis
             </Link>
           </motion.div>
+          </div>
+
+          {/* Kolom kanan: Leaderboard */}
+          <div className="w-full lg:sticky lg:top-6">
+            <Leaderboard quizId={quiz.id} />
+          </div>
+          </div>
         </main>
       </div>
     );
@@ -299,14 +343,29 @@ export default function QuizClient({ quiz }) {
               {currentIndex + 1}/{questions.length}
             </p>
           </div>
-          <button
-            onClick={() => setShowExitConfirm(true)}
-            className="text-sm shrink-0"
-            style={{ color: "var(--color-muted)" }}
-          >
-            <span className="hidden sm:inline">Keluar dari Kuis</span>
-            <span className="sm:hidden">Keluar</span>
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <span
+              style={{
+                fontFamily: "var(--font-jetbrains)",
+                fontSize: "12px",
+                fontWeight: 600,
+                color: "var(--color-primary)",
+                background: "var(--color-primary-tint)",
+                padding: "3px 8px",
+                borderRadius: "6px",
+              }}
+            >
+              ⏱ {formatStopwatch(elapsedSeconds)}
+            </span>
+            <button
+              onClick={() => setShowExitConfirm(true)}
+              className="text-sm"
+              style={{ color: "var(--color-muted)" }}
+            >
+              <span className="hidden sm:inline cursor-pointer">Keluar dari Kuis</span>
+              <span className="sm:hidden cursor-pointer">Keluar</span>
+            </button>
+          </div>
         </div>
 
         {/* Progress bar */}
@@ -402,7 +461,7 @@ export default function QuizClient({ quiz }) {
                       onClick={() => handleSelect(opt.key)}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
-                      className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all"
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all cursor-pointer"
                       style={{
                         border: `1.5px solid ${isSelected ? "var(--color-primary)" : "var(--color-line)"}`,
                         background: isSelected ? "var(--color-primary-tint)" : "white",
@@ -434,7 +493,7 @@ export default function QuizClient({ quiz }) {
               onClick={goPrev}
               disabled={currentIndex === 0}
               whileHover={{ x: -2 }}
-              className="text-sm font-medium disabled:opacity-30"
+              className="text-sm font-medium disabled:opacity-30 cursor-pointer"
               style={{ color: "var(--color-muted)" }}
             >
               ← Sebelumnya
@@ -445,7 +504,7 @@ export default function QuizClient({ quiz }) {
                 onClick={goNext}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-5 py-2 rounded-xl text-sm font-semibold text-white"
+                className="px-5 py-2 rounded-xl text-sm font-semibold text-white cursor-pointer"
                 style={{ background: "var(--color-primary)" }}
               >
                 Selanjutnya →
