@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const stackColors = {
   perfect: "var(--color-success)",
@@ -10,6 +11,17 @@ const stackColors = {
 };
 
 export default function DashboardClient({ topics, userName, summary, continueQuiz, recentActivity }) {
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("semua");
+
+  const filteredTopics = topics
+    .filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
+    .filter((t) => {
+      if (filter === "tuntas") return t.isTopicComplete;
+      if (filter === "belum") return !t.isTopicComplete;
+      return true;
+    });
+
   return (
     <main className="px-6 py-8 max-w-5xl mx-auto">
       <motion.div
@@ -135,12 +147,56 @@ export default function DashboardClient({ topics, userName, summary, continueQui
       )}
 
       {/* Grid topik */}
-      <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-foreground)" }}>
-        Pilih Topik
-      </h2>
+      <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h2 className="text-base font-bold shrink-0" style={{ color: "var(--color-foreground)" }}>
+            Pilih Topik
+          </h2>
+          <div className="flex gap-2 flex-wrap">
+            {[
+              { key: "semua", label: "Semua" },
+              { key: "tuntas", label: "Tuntas" },
+              { key: "belum", label: "Belum Tuntas" },
+            ].map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+                style={{
+                  background: filter === f.key ? "var(--color-primary)" : "white",
+                  color: filter === f.key ? "white" : "var(--color-muted)",
+                  border: `1px solid ${filter === f.key ? "var(--color-primary)" : "var(--color-line)"}`,
+                }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari topik..."
+          className="rounded-xl px-4 py-2 text-sm outline-none w-full max-w-xs"
+          style={{ border: "1px solid var(--color-line)", background: "#FAFAF9", color: "var(--color-foreground)" }}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-line)")}
+        />
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {topics.map((topic, i) => (
+        {filteredTopics.length === 0 ? (
+          <p className="text-sm col-span-full text-center py-8" style={{ color: "var(--color-muted)" }}>
+            {search
+              ? `Tidak ada topik yang cocok dengan "${search}".`
+              : filter === "tuntas"
+              ? "Belum ada topik yang tuntas."
+              : filter === "belum"
+              ? "Semua topik sudah tuntas!"
+              : "Belum ada topik."}
+          </p>
+        ) : filteredTopics.map((topic, i) => (
           <motion.div
             key={topic.id}
             initial={{ opacity: 0, y: 16 }}

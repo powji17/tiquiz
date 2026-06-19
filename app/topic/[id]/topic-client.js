@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const statusConfig = {
   perfect: {
@@ -22,6 +23,18 @@ const statusConfig = {
 };
 
 export default function TopicClient({ topic, quizzes }) {
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("semua");
+
+  const filteredQuizzes = quizzes
+    .filter((q) => q.name.toLowerCase().includes(search.toLowerCase()))
+    .filter((q) => {
+      if (filter === "sempurna") return q.status === "perfect";
+      if (filter === "sebagian") return q.status === "partial";
+      if (filter === "belum") return q.status === "empty";
+      return true;
+    });
+
   return (
     <main className="px-6 py-8 max-w-5xl mx-auto">
       {/* Header */}
@@ -49,9 +62,55 @@ export default function TopicClient({ topic, quizzes }) {
         </p>
       </motion.div>
 
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari kuis..."
+          className="rounded-xl px-4 py-2 text-sm outline-none w-full sm:max-w-xs"
+          style={{ border: "1px solid var(--color-line)", background: "#FAFAF9", color: "var(--color-foreground)" }}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-line)")}
+        />
+        <div className="flex gap-2 flex-wrap">
+          {[
+            { key: "semua", label: "Semua" },
+            { key: "sempurna", label: "Sempurna" },
+            { key: "sebagian", label: "Sebagian" },
+            { key: "belum", label: "Belum Dikerjakan" },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+              style={{
+                background: filter === f.key ? "var(--color-primary)" : "white",
+                color: filter === f.key ? "white" : "var(--color-muted)",
+                border: `1px solid ${filter === f.key ? "var(--color-primary)" : "var(--color-line)"}`,
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Grid kuis */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {quizzes.map((quiz, i) => {
+        {filteredQuizzes.length === 0 ? (
+          <p className="text-sm col-span-full text-center py-8" style={{ color: "var(--color-muted)" }}>
+            {search
+              ? `Tidak ada kuis yang cocok dengan "${search}".`
+              : filter === "sempurna"
+              ? "Belum ada kuis yang sempurna di topik ini."
+              : filter === "sebagian"
+              ? "Belum ada kuis yang dikerjakan sebagian."
+              : filter === "belum"
+              ? "Semua kuis sudah dikerjakan!"
+              : "Belum ada kuis di topik ini."}
+          </p>
+        ) : filteredQuizzes.map((quiz, i) => {
           const cfg = statusConfig[quiz.status];
 
           return (

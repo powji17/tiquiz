@@ -16,6 +16,19 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("semua");
+
+  const filteredUsers = users
+    .filter((u) =>
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((u) => {
+      if (filter === "user") return u.role === "USER";
+      if (filter === "admin") return u.role === "ADMIN";
+      return true;
+    });
 
   const openCreateForm = () => {
     setEditingUser(null);
@@ -141,6 +154,40 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
         </motion.button>
       </motion.div>
 
+      <div className="flex flex-wrap items-center gap-3 mb-3">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari nama atau email..."
+          className="rounded-xl px-4 py-2 text-sm outline-none w-full sm:max-w-xs"
+          style={{ border: "1px solid var(--color-line)", background: "#FAFAF9", color: "var(--color-foreground)" }}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-line)")}
+        />
+        <div className="flex gap-2 flex-wrap">
+          {[
+            { key: "semua", label: "Semua" },
+            { key: "user", label: "USER" },
+            { key: "admin", label: "ADMIN" },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+              style={{
+                background: filter === f.key ? "var(--color-primary)" : "white",
+                color: filter === f.key ? "white" : "var(--color-muted)",
+                border: `1px solid ${filter === f.key ? "var(--color-primary)" : "var(--color-line)"}`,
+                fontFamily: f.key !== "semua" ? "var(--font-jetbrains)" : undefined,
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Form tambah/edit */}
       <AnimatePresence>
         {showForm && (
@@ -263,7 +310,23 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
       {/* Daftar pengguna */}
       <div className="space-y-2">
         <AnimatePresence>
-        {users.map((user, i) => {
+        {filteredUsers.length === 0 ? (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-sm text-center py-10"
+            style={{ color: "var(--color-muted)" }}
+          >
+            {search
+              ? `Tidak ada pengguna yang cocok dengan "${search}".`
+              : filter === "user"
+              ? "Belum ada pengguna dengan role USER."
+              : filter === "admin"
+              ? "Belum ada pengguna dengan role ADMIN."
+              : "Belum ada pengguna."}
+          </motion.p>
+        ) : (
+          filteredUsers.map((user, i) => {
           const isSelf = user.id === currentUserId;
           const joinDate = new Date(user.createdAt).toLocaleDateString("id-ID", {
             day: "numeric",
@@ -329,7 +392,8 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
               </div>
             </motion.div>
           );
-        })}
+        })
+        )}
         </AnimatePresence>
       </div>
 

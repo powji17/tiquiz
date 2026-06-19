@@ -47,6 +47,10 @@ export async function POST(req) {
       },
     });
 
+    await prisma.quizAttempt.deleteMany({
+      where: { quizId: parseInt(quizId) },
+    });
+
     return NextResponse.json(question, { status: 201 });
   } catch (err) {
     console.error(err);

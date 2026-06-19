@@ -15,6 +15,12 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredQuizzes = quizzes.filter((q) =>
+    q.name.toLowerCase().includes(search.toLowerCase()) ||
+    (q.description && q.description.toLowerCase().includes(search.toLowerCase()))
+  );
 
   const openCreateForm = () => {
     setEditingQuiz(null);
@@ -138,6 +144,19 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
         </motion.button>
       </motion.div>
 
+      <div className="mb-3">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari kuis..."
+          className="rounded-xl px-4 py-2 text-sm outline-none w-full sm:max-w-xs"
+          style={{ border: "1px solid var(--color-line)", background: "#FAFAF9", color: "var(--color-foreground)" }}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-line)")}
+        />
+      </div>
+
       <AnimatePresence>
         {showForm && (
           <motion.div
@@ -207,17 +226,17 @@ export default function QuizzesAdminClient({ topic, initialQuizzes }) {
 
       <div className="space-y-2">
         <AnimatePresence>
-          {quizzes.length === 0 ? (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-sm text-center py-10"
-              style={{ color: "var(--color-muted)" }}
-            >
-              Belum ada kuis di topik ini. Klik "Tambah Kuis" untuk membuat yang pertama.
-            </motion.p>
-          ) : (
-            quizzes.map((quiz, i) => (
+          {filteredQuizzes.length === 0 ? (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-sm text-center py-10"
+            style={{ color: "var(--color-muted)" }}
+          >
+            {search ? `Tidak ada kuis yang cocok dengan "${search}".` : "Belum ada kuis di topik ini. Klik \"Tambah Kuis\" untuk membuat yang pertama."}
+          </motion.p>
+        ) : (
+          filteredQuizzes.map((quiz, i) => (
               <motion.div
                 key={quiz.id}
                 layout

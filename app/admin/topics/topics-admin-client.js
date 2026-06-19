@@ -15,6 +15,12 @@ export default function TopicsAdminClient({ initialTopics }) {
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredTopics = topics.filter((t) =>
+    t.name.toLowerCase().includes(search.toLowerCase()) ||
+    (t.description && t.description.toLowerCase().includes(search.toLowerCase()))
+  );
 
   const openCreateForm = () => {
     setEditingTopic(null);
@@ -137,6 +143,19 @@ export default function TopicsAdminClient({ initialTopics }) {
         </motion.button>
       </motion.div>
 
+      <div className="mb-3">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari topik..."
+          className="rounded-xl px-4 py-2 text-sm outline-none w-full sm:max-w-xs"
+          style={{ border: "1px solid var(--color-line)", background: "#FAFAF9", color: "var(--color-foreground)" }}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-primary)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-line)")}
+        />
+      </div>
+
       {/* Form tambah/edit */}
       <AnimatePresence>
         {showForm && (
@@ -208,17 +227,17 @@ export default function TopicsAdminClient({ initialTopics }) {
       {/* Daftar topik */}
       <div className="space-y-2">
         <AnimatePresence>
-        {topics.length === 0 ? (
+        {filteredTopics.length === 0 ? (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-sm text-center py-10"
             style={{ color: "var(--color-muted)" }}
           >
-            Belum ada topik. Klik "Tambah Topik" untuk membuat yang pertama.
+            {search ? `Tidak ada topik yang cocok dengan "${search}".` : "Belum ada topik. Klik \"Tambah Topik\" untuk membuat yang pertama."}
           </motion.p>
         ) : (
-          topics.map((topic, i) => (
+          filteredTopics.map((topic, i) => (
             <motion.div
               key={topic.id}
               layout

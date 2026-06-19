@@ -42,6 +42,10 @@ export async function PUT(req, { params }) {
       data: { text, optionA, optionB, optionC, optionD, correctAnswer, explanation },
     });
 
+    await prisma.quizAttempt.deleteMany({
+      where: { quizId: question.quizId },
+    });
+
     return NextResponse.json(question);
   } catch (err) {
     console.error(err);
@@ -57,7 +61,23 @@ export async function DELETE(req, { params }) {
   const questionId = parseInt(id);
 
   try {
+    // Ambil quizId dulu sebelum soal dihapus
+    const question = await prisma.question.findUnique({
+      where: { id: questionId },
+      select: { quizId: true },
+    });
+
+    if (!question) {
+      return NextResponse.json({ error: "Soal tidak ditemukan." }, { status: 404 });
+    }
+
     await prisma.question.delete({ where: { id: questionId } });
+
+    // Reset semua attempt di kuis ini karena konten soal berubah
+    await prisma.quizAttempt.deleteMany({
+      where: { quizId: question.quizId },
+    });
+
     return NextResponse.json({ message: "Soal berhasil dihapus." });
   } catch (err) {
     console.error(err);

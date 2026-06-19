@@ -81,10 +81,10 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
 
       if (editingQuestion) {
         setQuestions((prev) => prev.map((q) => (q.id === editingQuestion.id ? data : q)));
-        toast.success("Soal berhasil diperbarui!");
+        toast.success("Soal berhasil diperbarui. Riwayat attempt di kuis ini direset.");
       } else {
         setQuestions((prev) => [...prev, data]);
-        toast.success("Soal berhasil ditambahkan!");
+        toast.success("Soal berhasil ditambahkan. Riwayat attempt di kuis ini direset.");
       }
 
       closeForm();
@@ -107,7 +107,7 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
         toast.error(data.error || "Gagal menghapus soal.");
       } else {
         setQuestions((prev) => prev.filter((q) => q.id !== question.id));
-        toast.success("Soal berhasil dihapus.");
+        toast.success("Soal berhasil dihapus. Riwayat attempt di kuis ini direset.");
       }
     } catch (err) {
       toast.error("Gagal terhubung ke server.");
