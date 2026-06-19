@@ -24,6 +24,8 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
 
   const openCreateForm = () => {
     setEditingQuestion(null);
@@ -54,8 +56,13 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSaveClick = (e) => {
     e.preventDefault();
+    setShowSaveConfirm(true);
+  };
+
+  const handleSubmit = async () => {
+    setShowSaveConfirm(false);
     setSubmitting(true);
 
     try {
@@ -170,7 +177,7 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
             className="overflow-hidden mb-4"
           >
             <form
-              onSubmit={handleSubmit}
+              onSubmit={handleSaveClick}
               className="bg-white rounded-2xl p-5 space-y-3"
               style={{ border: "1px solid var(--color-primary)" }}
             >
@@ -344,9 +351,24 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
       </div>
 
       <ConfirmModal
+        open={showSaveConfirm}
+        title={editingQuestion ? "Simpan perubahan soal?" : "Tambah soal baru?"}
+        description={
+          editingQuestion
+            ? "Menyimpan perubahan akan menghapus semua riwayat pengerjaan dan leaderboard kuis ini secara permanen. Lanjutkan?"
+            : "Menambah soal baru akan menghapus semua riwayat pengerjaan dan leaderboard kuis ini secara permanen. Lanjutkan?"
+        }
+        confirmLabel={editingQuestion ? "Simpan Perubahan" : "Tambah Soal"}
+        danger={false}
+        loading={submitting}
+        onConfirm={handleSubmit}
+        onCancel={() => setShowSaveConfirm(false)}
+      />
+
+      <ConfirmModal
         open={!!deleteTarget}
         title="Hapus soal ini?"
-        description="Tindakan ini tidak dapat dibatalkan."
+        description="Menghapus soal akan menghapus semua riwayat pengerjaan dan leaderboard kuis ini secara permanen. Tindakan ini tidak dapat dibatalkan."
         loading={deletingId === deleteTarget?.id}
         onConfirm={confirmDelete}
         onCancel={() => setDeleteTarget(null)}
