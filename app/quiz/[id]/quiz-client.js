@@ -142,7 +142,7 @@ export default function QuizClient({ quiz }) {
               </span>
             </div>
             <Link href={backHref} className="text-sm" style={{ color: "var(--color-muted)" }}>
-              ← Kembali
+              Kembali
             </Link>
           </div>
         </header>
