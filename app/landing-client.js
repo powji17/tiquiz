@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
+import LandingNavbar from "@/app/components/LandingNavbar";
 
 const features = [
   {
     title: "Kuis Interaktif",
     desc: "Kerjakan soal pilihan ganda dengan navigasi soal, progress tracker, dan penilaian instan.",
-    color: "var(--color-primary)",
+    color: "#0EA5C9",
   },
   {
     title: "Pembahasan Lengkap",
@@ -18,87 +19,22 @@ const features = [
   {
     title: "Progress per Topik",
     desc: "Pantau skor terbaik, kuis yang sudah tuntas, dan rata-rata pemahamanmu di tiap topik.",
-    color: "#8B5CF6",
+    color: "var(--color-warning)",
   },
   {
     title: "Leaderboard Kuis",
     desc: "Lihat peringkatmu berdasarkan skor dan kecepatan di setiap kuis, lalu bersaing sehat dengan teman sekelas.",
-    color: "#0EA5C9",
+    color: "#EC4899",
   },
 ];
 
-export default function LandingClient({ topics, totalQuestions }) {
+export default function LandingClient({ topics, totalTopics, totalQuizzes, totalQuestions }) {
   const { data: session } = useSession();
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       {/* Nav */}
-      <motion.nav
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        style={{ borderBottom: "1px solid var(--color-line)" }}
-        className="bg-white px-6 py-4"
-      >
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <motion.div
-            className="flex items-center gap-2"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--font-jetbrains)",
-                background: "var(--color-primary-tint)",
-                color: "var(--color-primary)",
-                fontSize: "11px",
-                fontWeight: 600,
-                padding: "2px 8px",
-                borderRadius: "4px",
-              }}
-            >
-              TQ
-            </span>
-            <span className="text-base font-bold" style={{ color: "var(--color-foreground)" }}>
-              TIQuiz
-            </span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            {session ? (
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-semibold px-4 py-2 rounded-lg text-white inline-block"
-                  style={{ background: "var(--color-primary)" }}
-                >
-                  Buka Dashboard
-                </Link>
-              </motion.div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link href="/login" className="text-sm font-medium" style={{ color: "var(--color-muted)" }}>
-                  Masuk
-                </Link>
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                  <Link
-                    href="/register"
-                    className="text-sm font-semibold px-4 py-2 rounded-lg text-white inline-block"
-                    style={{ background: "var(--color-primary)" }}
-                  >
-                    Daftar
-                  </Link>
-                </motion.div>
-              </div>
-            )}
-          </motion.div>
-        </div>
-      </motion.nav>
+      <LandingNavbar />
 
       {/* Hero */}
       <section
@@ -226,7 +162,7 @@ export default function LandingClient({ topics, totalQuestions }) {
       {/* Fitur */}
       <section
         className="px-6 py-16"
-        style={{ background: "white", borderTop: "1px solid var(--color-line)", borderBottom: "1px solid var(--color-line)" }}
+        style={{ background: "var(--background)", borderTop: "1px solid var(--color-line)", borderBottom: "1px solid var(--color-line)" }}
       >
         <div className="max-w-5xl mx-auto">
           <motion.h2
@@ -286,11 +222,11 @@ export default function LandingClient({ topics, totalQuestions }) {
             Jelajahi topik yang tersedia
           </h2>
           <p className="text-sm" style={{ color: "var(--color-muted)" }}>
-            {topics.length} topik · {totalQuestions} soal siap dikerjakan
+            {totalTopics} topik · {totalQuizzes} kuis · {totalQuestions} soal siap dikerjakan
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
           {topics.map((topic, i) => (
             <motion.div
               key={topic.id}
@@ -332,10 +268,33 @@ export default function LandingClient({ topics, totalQuestions }) {
             </motion.div>
           ))}
         </div>
+
+        {totalTopics > 6 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mt-6"
+          >
+            <p className="text-sm mb-5" style={{ color: "var(--color-muted)" }}>
+              Menampilkan 6 dari {totalTopics} topik yang tersedia
+            </p>
+            <motion.div className="inline-block" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href={session ? "/dashboard" : "/login"}
+                className="text-sm font-semibold px-6 py-3 rounded-xl text-white inline-block"
+                style={{ background: "var(--color-primary)" }}
+              >
+                Lihat Semua Topik
+              </Link>
+            </motion.div>
+          </motion.div>
+        )}
       </section>
 
       {/* CTA penutup */}
-      <section className="px-6 py-16" style={{ background: "var(--color-primary)" }}>
+      <section className="landing-cta px-6 py-16" style={{ background: "var(--color-primary)" }}>
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}

@@ -171,9 +171,11 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
             { key: "user", label: "USER" },
             { key: "admin", label: "ADMIN" },
           ].map((f) => (
-            <button
+            <motion.button
               key={f.key}
               onClick={() => setFilter(f.key)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
               style={{
                 background: filter === f.key ? "var(--color-primary)" : "white",
@@ -183,7 +185,7 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
               }}
             >
               {f.label}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -362,7 +364,7 @@ export default function UsersAdminClient({ initialUsers, currentUserId }) {
                     className="text-xs font-medium px-1.5 py-0.5 rounded"
                     style={{
                       fontFamily: "var(--font-jetbrains)",
-                      background: user.role === "ADMIN" ? "var(--color-success-tint)" : "#FAFAF9",
+                      background: user.role === "ADMIN" ? "var(--color-success-tint)" : "var(--color-primary-tint)",
                       color: user.role === "ADMIN" ? "var(--color-success)" : "var(--color-muted)",
                     }}
                   >

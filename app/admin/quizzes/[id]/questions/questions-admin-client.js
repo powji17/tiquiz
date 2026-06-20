@@ -334,7 +334,7 @@ export default function QuestionsAdminClient({ quiz, initialQuestions }) {
                       key={key}
                       className="px-2.5 py-1.5 rounded-lg"
                       style={{
-                        background: isCorrect ? "var(--color-success-tint)" : "#FAFAF9",
+                        background: isCorrect ? "var(--color-success-tint)" : "var(--color-primary-tint)",
                         color: isCorrect ? "var(--color-success)" : "var(--color-muted)",
                       }}
                     >

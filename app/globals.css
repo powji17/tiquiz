@@ -5,6 +5,27 @@
   --foreground: #1B1A2E;
 }
 
+[data-theme="dark"] {
+  --background: #1C1B2E;
+  --foreground: #EEEDF8;
+
+  --color-primary: #7B6EF5;
+  --color-primary-dark: #9D93F8;
+  --color-primary-tint: #2A2850;
+
+  --color-muted: #8B8AA0;
+  --color-line: #2E2C45;
+
+  --color-success: #22C55E;
+  --color-success-tint: #0F2A1A;
+  --color-warning: #F59E0B;
+  --color-warning-tint: #2A1F0A;
+  --color-danger: #EF4444;
+  --color-danger-tint: #2A0F0F;
+
+  --color-stack-empty: #3A3858;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -32,4 +53,130 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+*, *::before, *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===== DARK MODE GLOBAL OVERRIDES ===== */
+
+[data-theme="dark"] body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Card dan container putih */
+[data-theme="dark"] .bg-white {
+  background: #252340 !important;
+}
+
+/* Background input dan form */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: #1C1B2E !important;
+  color: var(--foreground) !important;
+  border-color: var(--color-line) !important;
+}
+
+/* Background abu-abu terang (bg-gray-50, bg-gray-100) */
+[data-theme="dark"] .bg-gray-50,
+[data-theme="dark"] .bg-gray-100 {
+  background: #1C1B2E !important;
+}
+
+/* Teks abu-abu */
+[data-theme="dark"] .text-gray-800,
+[data-theme="dark"] .text-gray-700,
+[data-theme="dark"] .text-gray-600 {
+  color: var(--foreground) !important;
+}
+
+[data-theme="dark"] .text-gray-500,
+[data-theme="dark"] .text-gray-400 {
+  color: var(--color-muted) !important;
+}
+
+/* Border abu-abu */
+[data-theme="dark"] .border-gray-200,
+[data-theme="dark"] .border-gray-300 {
+  border-color: var(--color-line) !important;
+}
+
+/* Skeleton loading */
+[data-theme="dark"] .animate-pulse {
+  background: #2E2C45 !important;
+}
+
+/* Modal overlay backdrop */
+[data-theme="dark"] .bg-black\/40 {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* CTA section landing page di dark mode */
+[data-theme="dark"] .landing-cta {
+  background: #4C3FC4 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* ===== DARK MODE SPESIFIK KOMPONEN ===== */
+
+/* Pill filter (Semua, Tuntas, Belum Tuntas, dll) */
+[data-theme="dark"] button[style*="background: white"],
+[data-theme="dark"] button[style*="background:white"] {
+  background: #252340 !important;
+  color: var(--color-muted) !important;
+}
+
+/* Tombol navigasi soal (nomor 1,2,3 dst) */
+[data-theme="dark"] .quiz-nav-btn {
+  background: #252340 !important;
+  color: var(--color-muted) !important;
+}
+
+/* Opsi jawaban di halaman kuis */
+[data-theme="dark"] .quiz-option {
+  background: #252340 !important;
+  color: var(--foreground) !important;
+}
+
+/* Badge role USER di kelola pengguna */
+[data-theme="dark"] span[style*="background: #FAFAF9"],
+[data-theme="dark"] span[style*="background:#FAFAF9"] {
+  background: #252340 !important;
+}
+
+/* Keterangan "Belum dikerjakan" di profil */
+[data-theme="dark"] .text-stack-empty {
+  color: var(--color-stack-empty) !important;
+}
+
+/* Modal konfirmasi */
+[data-theme="dark"] .modal-card {
+  background: #252340 !important;
+}
+
+/* Tombol batal di modal */
+[data-theme="dark"] button[style*="border: 1px solid var(--color-line)"] {
+  background: #252340 !important;
+  color: var(--foreground) !important;
 }

@@ -80,9 +80,11 @@ export default function TopicClient({ topic, quizzes }) {
             { key: "sebagian", label: "Sebagian" },
             { key: "belum", label: "Belum Dikerjakan" },
           ].map((f) => (
-            <button
+            <motion.button
               key={f.key}
               onClick={() => setFilter(f.key)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
               style={{
                 background: filter === f.key ? "var(--color-primary)" : "white",
@@ -91,7 +93,7 @@ export default function TopicClient({ topic, quizzes }) {
               }}
             >
               {f.label}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>

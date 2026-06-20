@@ -8,7 +8,16 @@ export default async function HomePage() {
     take: 6,
   });
 
+  const totalTopics = await prisma.topic.count();
+  const totalQuizzes = await prisma.quiz.count();
   const totalQuestions = await prisma.question.count();
 
-  return <LandingClient topics={topics} totalQuestions={totalQuestions} />;
+  return (
+    <LandingClient
+      topics={topics}
+      totalTopics={totalTopics}
+      totalQuizzes={totalQuizzes}
+      totalQuestions={totalQuestions}
+    />
+  );
 }

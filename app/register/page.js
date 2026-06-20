@@ -56,23 +56,36 @@ export default function RegisterPage() {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="w-full max-w-md"
       >
-        <div className="flex items-center gap-2 mb-8">
-          <span
-            style={{
-              fontFamily: "var(--font-jetbrains)",
-              background: "var(--color-primary-tint)",
-              color: "var(--color-primary)",
-              fontSize: "11px",
-              fontWeight: 600,
-              padding: "2px 8px",
-              borderRadius: "4px",
-            }}
+        {/* Logo + tombol kembali */}
+        <div className="flex items-center justify-between mb-8">
+          <Link href="/" className="flex items-center gap-2">
+            <span
+              style={{
+                fontFamily: "var(--font-jetbrains)",
+                background: "var(--color-primary-tint)",
+                color: "var(--color-primary)",
+                fontSize: "11px",
+                fontWeight: 600,
+                padding: "2px 8px",
+                borderRadius: "4px",
+              }}
+            >
+              TQ
+            </span>
+            <span className="text-base font-bold" style={{ color: "var(--color-foreground)" }}>
+              TIQuiz
+            </span>
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 text-sm"
+            style={{ color: "var(--color-muted)" }}
           >
-            TQ
-          </span>
-          <span className="text-base font-bold" style={{ color: "var(--color-foreground)" }}>
-            TIQuiz
-          </span>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali
+          </Link>
         </div>
 
         <div

@@ -39,6 +39,7 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${jakarta.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

@@ -186,7 +186,7 @@ export default function ProfileClient({ user, topicStats, summary }) {
                       </span>
                     )}
                     {topic.completedCount === 0 && (
-                      <span className="text-xs" style={{ color: "var(--color-stack-empty)" }}>
+                      <span className="text-xs" style={{ color: "var(--color-muted)" }}>
                         Belum dikerjakan
                       </span>
                     )}
