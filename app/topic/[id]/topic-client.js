@@ -224,7 +224,7 @@ export default function TopicClient({ topic, quizzes }) {
                   {/* Progress bar kosong (empty) */}
                   {quiz.status === "empty" && (
                     <div className="mt-3">
-                      <p className="text-xs" style={{ color: "var(--color-stack-empty)" }}>
+                      <p className="text-xs" style={{ color: "var(--color-muted)" }}>
                         Belum dikerjakan
                       </p>
                     </div>
